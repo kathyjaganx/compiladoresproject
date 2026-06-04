@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniLang Compiler — Diseño de Lenguaje de Programación</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose-50: #fff1f5;
+  --rose-100: #ffe4ed;
+  --rose-200: #ffc9db;
+  --rose-300: #ff9bbe;
+  --rose-400: #ff6b9d;
+  --rose-500: #f43f7a;
+  --rose-600: #e11d62;
+  --pink-soft: #fce7f3;
+  --pink-mid: #fbcfe8;
+  --pink-accent: #ec4899;
+  --lilac: #e9d5ff;
+  --lilac-deep: #a855f7;
+  --mint: #d1fae5;
+  --mint-deep: #059669;
+  --gold: #fef3c7;
+  --gold-deep: #d97706;
+  --cream: #fdf8f0;
+  --white: #ffffff;
+  --text-dark: #1a0a14;
+  --text-mid: #6b3a52;
+  --text-soft: #9d6b81;
+  --border: #f5c6d8;
+  --shadow: rgba(244,63,122,0.12);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--rose-50);
+  color: var(--text-dark);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 10% 20%, rgba(252,207,232,0.5) 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 80%, rgba(233,213,255,0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.3) 0%, transparent 70%);
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #fff0f5 0%, #fce7f3 40%, #ede9fe 100%);
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 24px var(--shadow);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--rose-400), var(--lilac-deep));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(236,72,153,0.3);
+}
+.logo-text { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--rose-600); letter-spacing: -0.5px; }
+.logo-sub { font-size: 11px; color: var(--text-soft); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.nav {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  backdrop-filter: blur(10px);
+}
+.nav-btn {
+  padding: 7px 16px;
+  border-radius: 9px;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-family: 'Nunito', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  white-space: nowrap;
+}
+.nav-btn.active {
+  background: linear-gradient(135deg, var(--rose-400), var(--pink-accent));
+  color: white;
+  box-shadow: 0 4px 12px rgba(236,72,153,0.35);
+}
+.nav-btn:hover:not(.active) { background: var(--rose-100); color: var(--rose-600); }
+
+/* ── LAYOUT ── */
+.app { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
+.panel { display: none; }
+.panel.active { display: block; animation: fadeUp .35s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── CARDS ── */
+.card {
+  background: rgba(255,255,255,0.85);
+  border: 1.5px solid var(--border);
+  border-radius: 18px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 20px var(--shadow);
+  transition: box-shadow .2s;
+}
+.card:hover { box-shadow: 0 6px 32px rgba(236,72,153,0.15); }
+
+.card-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 16px;
+  color: var(--rose-600);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+/* ── HERO (intro) ── */
+.hero {
+  background: linear-gradient(135deg, #fff0f5, #fce7f3, #ede9fe);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 36px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '🌸🌸🌸';
+  position: absolute;
+  right: 32px; top: 20px;
+  font-size: 72px;
+  opacity: 0.18;
+}
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--rose-600); margin-bottom: 8px; }
+.hero p { font-size: 14px; color: var(--text-mid); line-height: 1.7; max-width: 700px; }
+.hero-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.chip {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+.chip-rose { background: var(--rose-100); color: var(--rose-600); border: 1px solid var(--rose-200); }
+.chip-lilac { background: var(--lilac); color: var(--lilac-deep); border: 1px solid #d8b4fe; }
+.chip-mint { background: var(--mint); color: var(--mint-deep); border: 1px solid #6ee7b7; }
+.chip-gold { background: var(--gold); color: var(--gold-deep); border: 1px solid #fde68a; }
+
+/* ── EDITOR ── */
+textarea {
+  width: 100%;
+  height: 200px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 400;
+  resize: vertical;
+  background: #fff8fb;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  color: var(--text-dark);
+  line-height: 1.7;
+  transition: border-color .2s, box-shadow .2s;
+}
+textarea:focus { outline: none; border-color: var(--pink-accent); box-shadow: 0 0 0 3px rgba(236,72,153,0.12); }
+
+/* ── SAMPLE CHIPS ── */
+.samples { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.sample-btn {
+  font-size: 12px;
+  padding: 5px 13px;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: var(--text-mid);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  transition: all .15s;
+}
+.sample-btn:hover { border-color: var(--pink-accent); color: var(--pink-accent); background: var(--pink-soft); }
+
+/* ── BUTTONS ── */
+.btn-row { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+.btn {
+  padding: 9px 22px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: white;
+  color: var(--text-mid);
+  font-family: 'Nunito', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all .18s;
+}
+.btn:hover { background: var(--rose-50); border-color: var(--rose-300); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--rose-400), var(--pink-accent));
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 16px rgba(236,72,153,0.35);
+}
+.btn.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(236,72,153,0.45); }
+.btn.secondary {
+  background: linear-gradient(135deg, var(--lilac), #d8b4fe);
+  border-color: transparent;
+  color: var(--lilac-deep);
+}
+
+/* ── METRICS ── */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+.metric {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 14px;
+  text-align: center;
+  box-shadow: 0 2px 12px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.metric::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(to right, var(--rose-300), var(--pink-accent));
+}
+.metric.err::before { background: linear-gradient(to right, #fca5a5, #ef4444); }
+.metric-val { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--rose-500); }
+.metric.err .metric-val { color: #ef4444; }
+.metric-lbl { font-size: 11px; color: var(--text-soft); margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.metric-icon { font-size: 22px; margin-bottom: 4px; }
+
+/* ── TABLES ── */
+.tbl-wrap { overflow-x: auto; border-radius: 12px; border: 1.5px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead tr { background: linear-gradient(to right, #fff0f5, #fce7f3); }
+th { padding: 10px 16px; text-align: left; font-weight: 800; font-size: 10.5px; color: var(--rose-600); text-transform: uppercase; letter-spacing: .07em; border-bottom: 1.5px solid var(--border); }
+td { padding: 9px 16px; border-bottom: 1px solid #fce4ef; vertical-align: middle; color: var(--text-dark); }
+tr:last-child td { border-bottom: none; }
+tr:nth-child(even) td { background: #fff8fb; }
+tr:hover td { background: #fff0f5; }
+
+/* ── TOKEN BADGES ── */
+.tok { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; letter-spacing: .03em; }
+.tok-KW   { background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+.tok-ID   { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+.tok-INT  { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.tok-DEC  { background: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+.tok-STR  { background: #ede9fe; color: #5b21b6; border: 1px solid #ddd6fe; }
+.tok-BOOL { background: #ecfdf5; color: #064e3b; border: 1px solid #6ee7b7; }
+.tok-OP   { background: #e0f2fe; color: #0c4a6e; border: 1px solid #bae6fd; }
+.tok-ASSIGN { background: #fdf4ff; color: #701a75; border: 1px solid #e879f9; }
+.tok-PUN  { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+.tok-ERR  { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
+
+/* ── ERRORS ── */
+.error-box {
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #b91c1c;
+  display: none;
+  font-family: 'DM Mono', monospace;
+}
+.error-box.show { display: block; }
+.success-msg { color: var(--mint-deep); font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+.fail-msg { color: #b91c1c; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+
+/* ── TREE ── */
+.tree-box {
+  background: #fff8fb;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 22px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12.5px;
+  color: var(--text-dark);
+  line-height: 2;
+  white-space: pre;
+  overflow-x: auto;
+  min-height: 160px;
+}
+
+/* ── BNF ── */
+.bnf-box {
+  background: #fff8fb;
+  border-left: 4px solid var(--rose-400);
+  border-radius: 0 12px 12px 0;
+  padding: 18px 24px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12.5px;
+  line-height: 2.2;
+  color: var(--text-dark);
+  white-space: pre;
+  overflow-x: auto;
+}
+
+/* ── LEGEND ── */
+.legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-mid); font-weight: 600; }
+.legend-dot { width: 16px; height: 16px; border-radius: 4px; }
+
+/* ── CONWAY WRAP ── */
+.conway-wrap {
+  background: #fff8fb;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  overflow-x: auto;
+}
+
+/* ── AST WRAP ── */
+.ast-wrap {
+  overflow-x: auto;
+  background: #fff8fb;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* ── AFD WRAP ── */
+.afd-wrap {
+  background: #fff8fb;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  overflow-x: auto;
+  margin-top: 16px;
+}
+
+/* ── GRID 2-COL ── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .metrics { grid-template-columns: repeat(2,1fr); }
+  .header-inner { flex-direction: column; height: auto; padding: 12px 0; }
+  .nav { flex-wrap: wrap; justify-content: center; }
+}
+
+/* ── DISCRIMINADORA TABLE ── */
+.disc-table { font-size: 12px; }
+.disc-table td, .disc-table th { padding: 7px 12px; }
+.state-circle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 50%;
+  font-size: 11px; font-weight: 800;
+  border: 2px solid var(--rose-400);
+  background: var(--rose-50); color: var(--rose-600);
+}
+.state-final {
+  border: 3px double var(--pink-accent);
+  background: var(--pink-soft);
+}
+.state-error { border-color: #ef4444; background: #fef2f2; color: #b91c1c; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--rose-50); }
+::-webkit-scrollbar-thumb { background: var(--rose-200); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--rose-400); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">🌸</div>
+      <div>
+        <div class="logo-text">JAGAN</div>
+        <div class="logo-sub">Diseño de Lenguaje de Programación</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn active" onclick="showTab('lexico',this)">🔍 Análisis Léxico</button>
+      <button class="nav-btn" onclick="showTab('automata',this)">⚙️ Autómata AFD</button>
+      <button class="nav-btn" onclick="showTab('sintactico',this)">🌿 Análisis Sintáctico</button>
+      <button class="nav-btn" onclick="showTab('ast',this)">🌳 Árbol AST</button>
+      <button class="nav-btn" onclick="showTab('teoria',this)">📐 BNF & Conway</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+
+<!-- ═══ TAB LÉXICO ═══ -->
+<div id="tab-lexico" class="panel active">
+  <div class="hero">
+    <h1>🌸 Analizador Léxico — MiniLang</h1>
+    <p>Identifica y clasifica cada token del código fuente según las categorías léxicas definidas. Ingresa código MiniLang y presiona <strong>Analizar</strong> para ver la tabla de símbolos, tokens generados y errores detectados.</p>
+    <div class="hero-chips">
+      <span class="chip chip-rose">Identificadores</span>
+      <span class="chip chip-lilac">Palabras Reservadas</span>
+      <span class="chip chip-mint">Literales</span>
+      <span class="chip chip-gold">Operadores</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Código Fuente MiniLang</div>
+    <div class="samples">
+      <button class="sample-btn" onclick="loadSample(0)">📋 Ejemplo Completo</button>
+      <button class="sample-btn" onclick="loadSample(1)">🔀 Condicional</button>
+      <button class="sample-btn" onclick="loadSample(2)">🔄 Ciclo while</button>
+      <button class="sample-btn" onclick="loadSample(3)">⚠️ Con errores</button>
+    </div>
+    <textarea id="srcCode" spellcheck="false">var x = 10;
+var y = 3.14;
+var nombre = "MiniLang";
+escribir(nombre);</textarea>
+    <div class="btn-row">
+      <button class="btn primary" onclick="runLexer()">▶ Analizar Código</button>
+      <button class="btn" onclick="clearAll()">🗑 Limpiar</button>
+      <span id="lex-status"></span>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-icon">🪙</div>
+      <div class="metric-val" id="m-tokens">—</div>
+      <div class="metric-lbl">Tokens</div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon">📄</div>
+      <div class="metric-val" id="m-lines">—</div>
+      <div class="metric-lbl">Líneas</div>
+    </div>
+    <div class="metric">
+      <div class="metric-icon">🔖</div>
+      <div class="metric-val" id="m-ids">—</div>
+      <div class="metric-lbl">Identificadores</div>
+    </div>
+    <div class="metric err">
+      <div class="metric-icon">❌</div>
+      <div class="metric-val" id="m-errs">—</div>
+      <div class="metric-lbl">Errores</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Tabla de Símbolos / Identificadores</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Identificador</th><th>Tipo inferido</th><th>Valor inicial</th><th>Línea</th><th>Usos</th></tr></thead>
+        <tbody id="symBody"><tr><td colspan="5" style="text-align:center;color:#cca;padding:22px;font-style:italic">Ejecuta el análisis para ver la tabla de símbolos...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Listado Completo de Tokens Generados</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Lexema</th><th>Categoría / Token</th><th>Expresión Regular</th><th>Línea</th></tr></thead>
+        <tbody id="tokBody"><tr><td colspan="5" style="text-align:center;color:#cca;padding:22px;font-style:italic">Ejecuta el análisis para ver los tokens...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="error-box" id="errBox"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Patrones de Expresiones Regulares por Categoría</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Categoría léxica</th><th>Expresión Regular</th><th>Descripción</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td><span class="tok tok-INT">ENTERO</span></td><td><code>[0-9]+</code></td><td>Uno o más dígitos decimales</td><td>0, 42, 100</td></tr>
+          <tr><td><span class="tok tok-DEC">DECIMAL</span></td><td><code>[0-9]+\.[0-9]+</code></td><td>Entero, punto, fracción</td><td>3.14, 0.5</td></tr>
+          <tr><td><span class="tok tok-STR">CADENA</span></td><td><code>"[^"]*"</code></td><td>Texto entre comillas dobles</td><td>"hola", "mundo"</td></tr>
+          <tr><td><span class="tok tok-BOOL">BOOLEANO</span></td><td><code>verdadero|falso</code></td><td>Literales booleanos</td><td>verdadero, falso</td></tr>
+          <tr><td><span class="tok tok-ID">IDENTIFICADOR</span></td><td><code>[a-zA-Z_][a-zA-Z0-9_]*</code></td><td>Letra/guion, luego alfanumérico</td><td>x, total, miVar</td></tr>
+          <tr><td><span class="tok tok-KW">PALABRA_RESERVADA</span></td><td><code>si|sino|mientras|var|leer|escribir|...</code></td><td>Palabras del lenguaje</td><td>si, var, mientras</td></tr>
+          <tr><td><span class="tok tok-OP">OP_ARITMÉTICO</span></td><td><code>[+\-*/%]</code></td><td>Operadores aritméticos básicos</td><td>+, -, *, /</td></tr>
+          <tr><td><span class="tok tok-OP">OP_RELACIONAL</span></td><td><code>==|!=|&lt;=|&gt;=|&lt;|&gt;</code></td><td>Comparación entre valores</td><td>&gt;, ==, &lt;=</td></tr>
+          <tr><td><span class="tok tok-OP">OP_LÓGICO</span></td><td><code>&amp;&amp;|\|\||!</code></td><td>Conjunción, disyunción, negación</td><td>&amp;&amp;, ||, !</td></tr>
+          <tr><td><span class="tok tok-ASSIGN">OP_ASIGNACIÓN</span></td><td><code>=(?!=)</code></td><td>Asignación (no igualdad)</td><td>=</td></tr>
+          <tr><td><span class="tok tok-PUN">PUNTUACIÓN</span></td><td><code>[;,(){}]</code></td><td>Delimitadores y separadores</td><td>; , ( ) { }</td></tr>
+          <tr><td><span class="tok tok-PUN">COMENTARIO</span></td><td><code>//[^\n]*</code></td><td>Comentario hasta fin de línea</td><td>// texto</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB AUTÓMATA AFD ═══ -->
+<div id="tab-automata" class="panel">
+  <div class="hero">
+    <h1>⚙️ Autómata Finito Determinista (AFD)</h1>
+    <p>La <strong>máquina discriminadora determinista</strong> permite identificar cada categoría léxica. Cada estado representa una etapa del reconocimiento; los estados dobles son estados de aceptación.</p>
+    <div class="hero-chips">
+      <span class="chip chip-rose">q0 Estado Inicial</span>
+      <span class="chip chip-mint">Estados Finales</span>
+      <span class="chip chip-lilac">Transiciones</span>
+      <span class="chip chip-gold">Error</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">AFD — Identificadores y Palabras Reservadas</div>
+    <div class="afd-wrap">
+      <svg width="100%" viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" font-family="Nunito,sans-serif" font-size="12">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 2L9 5L1 8" fill="none" stroke="#f43f7a" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+          <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 2L9 5L1 8" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+        <!-- q0 -->
+        <circle cx="80" cy="100" r="28" fill="#fff0f5" stroke="#f43f7a" stroke-width="2"/>
+        <text x="80" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#be185d" font-size="11">q0</text>
+        <text x="80" y="112" text-anchor="middle" fill="#9d6b81" font-size="9">inicio</text>
+        <!-- q1 -->
+        <circle cx="260" cy="100" r="28" fill="#fce7f3" stroke="#f43f7a" stroke-width="2"/>
+        <circle cx="260" cy="100" r="23" fill="none" stroke="#f43f7a" stroke-width="1.2"/>
+        <text x="260" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#be185d" font-size="11">q1</text>
+        <text x="260" y="112" text-anchor="middle" fill="#9d6b81" font-size="9">ID/KW</text>
+        <!-- q2 -->
+        <circle cx="440" cy="100" r="28" fill="#fce7f3" stroke="#f43f7a" stroke-width="2"/>
+        <circle cx="440" cy="100" r="23" fill="none" stroke="#f43f7a" stroke-width="1.2"/>
+        <text x="440" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#be185d" font-size="11">q2</text>
+        <text x="440" y="112" text-anchor="middle" fill="#9d6b81" font-size="9">KW confirmado</text>
+        <!-- qE -->
+        <circle cx="620" cy="100" r="28" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+        <text x="620" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#b91c1c" font-size="11">qE</text>
+        <text x="620" y="112" text-anchor="middle" fill="#b91c1c" font-size="9">error</text>
+        <!-- start arrow -->
+        <line x1="30" y1="100" x2="49" y2="100" stroke="#f43f7a" stroke-width="1.5" marker-end="url(#arr)"/>
+        <!-- q0→q1 letter/_ -->
+        <line x1="108" y1="100" x2="229" y2="100" stroke="#f43f7a" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="168" y="90" text-anchor="middle" fill="#be185d" font-weight="700" font-size="11">[a-zA-Z_]</text>
+        <!-- q1→q1 loop -->
+        <path d="M248 72 Q260 50 272 72" fill="none" stroke="#f43f7a" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="260" y="48" text-anchor="middle" fill="#be185d" font-size="10">[a-zA-Z0-9_]</text>
+        <!-- q1→q2 (si es kw) -->
+        <line x1="288" y1="100" x2="409" y2="100" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
+        <text x="348" y="90" text-anchor="middle" fill="#9d174d" font-size="10">∈ KEYWORDS</text>
+        <!-- q0→qE invalid -->
+        <path d="M95 126 Q357 180 591 126" fill="none" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr2)"/>
+        <text x="350" y="175" text-anchor="middle" fill="#b91c1c" font-size="10">símbolo inválido</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">AFD — Números (Enteros y Decimales)</div>
+    <div class="afd-wrap">
+      <svg width="100%" viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg" font-family="Nunito,sans-serif" font-size="12">
+        <defs>
+          <marker id="arN" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 2L9 5L1 8" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+        <!-- q0 -->
+        <circle cx="80" cy="100" r="28" fill="#fff0f5" stroke="#f59e0b" stroke-width="2"/>
+        <text x="80" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#92400e" font-size="11">q0</text>
+        <text x="80" y="112" text-anchor="middle" fill="#a16207" font-size="9">inicio</text>
+        <!-- q1 int -->
+        <circle cx="270" cy="100" r="28" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="270" cy="100" r="23" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="270" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#92400e" font-size="11">q1</text>
+        <text x="270" y="112" text-anchor="middle" fill="#a16207" font-size="9">ENTERO ✓</text>
+        <!-- q2 dot -->
+        <circle cx="450" cy="100" r="28" fill="#fff8f0" stroke="#f59e0b" stroke-width="2"/>
+        <text x="450" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#92400e" font-size="11">q2</text>
+        <text x="450" y="112" text-anchor="middle" fill="#a16207" font-size="9">punto visto</text>
+        <!-- q3 dec -->
+        <circle cx="630" cy="100" r="28" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+        <circle cx="630" cy="100" r="23" fill="none" stroke="#f59e0b" stroke-width="1.2"/>
+        <text x="630" y="96" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#92400e" font-size="11">q3</text>
+        <text x="630" y="112" text-anchor="middle" fill="#a16207" font-size="9">DECIMAL ✓</text>
+        <!-- start -->
+        <line x1="30" y1="100" x2="49" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arN)"/>
+        <!-- q0→q1 digit -->
+        <line x1="108" y1="100" x2="239" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arN)"/>
+        <text x="173" y="89" text-anchor="middle" fill="#92400e" font-weight="700" font-size="11">[0-9]</text>
+        <!-- q1 loop -->
+        <path d="M258 72 Q270 50 282 72" fill="none" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arN)"/>
+        <text x="270" y="47" text-anchor="middle" fill="#92400e" font-size="10">[0-9]</text>
+        <!-- q1→q2 dot -->
+        <line x1="298" y1="100" x2="419" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arN)"/>
+        <text x="358" y="89" text-anchor="middle" fill="#92400e" font-size="11">.</text>
+        <!-- q2→q3 digit -->
+        <line x1="478" y1="100" x2="599" y2="100" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arN)"/>
+        <text x="539" y="89" text-anchor="middle" fill="#92400e" font-weight="700" font-size="11">[0-9]</text>
+        <!-- q3 loop -->
+        <path d="M618 72 Q630 50 642 72" fill="none" stroke="#f59e0b" stroke-width="1.5" marker-end="url(#arN)"/>
+        <text x="630" y="47" text-anchor="middle" fill="#92400e" font-size="10">[0-9]</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">AFD — Cadenas de Texto</div>
+    <div class="afd-wrap">
+      <svg width="100%" viewBox="0 0 820 180" xmlns="http://www.w3.org/2000/svg" font-family="Nunito,sans-serif" font-size="12">
+        <defs>
+          <marker id="arS" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M1 2L9 5L1 8" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round"/>
+          </marker>
+        </defs>
+        <circle cx="80" cy="90" r="28" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
+        <text x="80" y="86" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#5b21b6" font-size="11">q0</text>
+        <text x="80" y="102" text-anchor="middle" fill="#6d28d9" font-size="9">inicio</text>
+        <circle cx="280" cy="90" r="28" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
+        <text x="280" y="86" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#5b21b6" font-size="11">q1</text>
+        <text x="280" y="102" text-anchor="middle" fill="#6d28d9" font-size="9">dentro cadena</text>
+        <circle cx="480" cy="90" r="28" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+        <circle cx="480" cy="90" r="23" fill="none" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="480" y="86" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#5b21b6" font-size="11">q2</text>
+        <text x="480" y="102" text-anchor="middle" fill="#6d28d9" font-size="9">CADENA ✓</text>
+        <circle cx="680" cy="90" r="28" fill="#fef2f2" stroke="#ef4444" stroke-width="2"/>
+        <text x="680" y="86" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#b91c1c" font-size="11">qE</text>
+        <text x="680" y="102" text-anchor="middle" fill="#b91c1c" font-size="9">sin cerrar</text>
+        <line x1="30" y1="90" x2="49" y2="90" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arS)"/>
+        <line x1="108" y1="90" x2="249" y2="90" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arS)"/>
+        <text x="178" y="79" text-anchor="middle" fill="#5b21b6" font-weight="700">"</text>
+        <path d="M268 62 Q280 42 292 62" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arS)"/>
+        <text x="280" y="38" text-anchor="middle" fill="#5b21b6" font-size="10">[^"\n]</text>
+        <line x1="308" y1="90" x2="449" y2="90" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arS)"/>
+        <text x="378" y="79" text-anchor="middle" fill="#5b21b6" font-weight="700">"</text>
+        <line x1="508" y1="90" x2="649" y2="90" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arS)"/>
+        <text x="578" y="79" text-anchor="middle" fill="#b91c1c" font-size="10">\n / EOF</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Tabla de Transiciones — Máquina Discriminadora</div>
+    <div class="tbl-wrap">
+      <table class="disc-table">
+        <thead>
+          <tr>
+            <th>Estado</th><th>Letra/_ → </th><th>Dígito →</th><th>" →</th><th>. →</th><th>Op ( + - * / ) →</th><th>= →</th><th>; , ( ) { } →</th><th>Otro →</th><th>Tipo aceptado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="state-circle">q0</span> inicio</td>
+            <td>q<sub>ID</sub>1</td><td>q<sub>N</sub>1</td><td>q<sub>S</sub>1</td><td>qE</td><td>q<sub>OP</sub>★</td><td>q<sub>AS</sub>★</td><td>q<sub>PUN</sub>★</td><td>qE</td><td>—</td>
+          </tr>
+          <tr>
+            <td><span class="state-circle">q<sub>ID</sub>1</span></td>
+            <td>q<sub>ID</sub>1</td><td>q<sub>ID</sub>1</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="tok tok-ID">ID / KW</span></td>
+          </tr>
+          <tr>
+            <td><span class="state-circle">q<sub>N</sub>1</span></td>
+            <td>—</td><td>q<sub>N</sub>1</td><td>—</td><td>q<sub>N</sub>2</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="tok tok-INT">ENTERO</span></td>
+          </tr>
+          <tr>
+            <td><span class="state-circle">q<sub>N</sub>2</span> (punto visto)</td>
+            <td>—</td><td>q<sub>N</sub>3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+          </tr>
+          <tr>
+            <td><span class="state-circle">q<sub>N</sub>3</span></td>
+            <td>—</td><td>q<sub>N</sub>3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="tok tok-DEC">DECIMAL</span></td>
+          </tr>
+          <tr>
+            <td><span class="state-circle">q<sub>S</sub>1</span> (en cadena)</td>
+            <td>q<sub>S</sub>1</td><td>q<sub>S</sub>1</td><td>q<sub>S</sub>2</td><td>q<sub>S</sub>1</td><td>q<sub>S</sub>1</td><td>q<sub>S</sub>1</td><td>q<sub>S</sub>1</td><td>qE</td><td>—</td>
+          </tr>
+          <tr>
+            <td><span class="state-circle state-final">q<sub>S</sub>2</span></td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="tok tok-STR">CADENA</span></td>
+          </tr>
+          <tr>
+            <td><span class="state-circle state-error">qE</span> error</td>
+            <td colspan="8" style="color:#b91c1c;font-style:italic">Token no reconocido — se reporta error léxico</td><td><span class="tok tok-ERR">ERROR</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB SINTÁCTICO ═══ -->
+<div id="tab-sintactico" class="panel">
+  <div class="hero">
+    <h1>Analizador Sintáctico LL(1)</h1>
+    <p>Analiza las estructuras de las líneas de código. Genera el árbol sintáctico, muestra la tabla LL(1) y los conjuntos FIRST y FOLLOW.</p>
+    <div class="hero-chips">
+      <span class="chip chip-rose">Gramática LL(1)</span>
+      <span class="chip chip-mint">FIRST / FOLLOW</span>
+      <span class="chip chip-lilac">Árbol Sintáctico</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Árbol Sintáctico — Vista Texto</div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="runParser()">Generar Árbol Sintáctico</button>
+      <span id="syn-status"></span>
+    </div>
+    <div class="tree-box" id="treeBox">El árbol sintáctico aparecerá aquí después de hacer clic en "Generar"...</div>
+    <div class="error-box" id="synErrBox"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Tabla de Análisis LL(1) — Fragmento</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>No Terminal</th><th>var</th><th>si</th><th>mientras</th><th>ID</th><th>escribir</th><th>leer</th><th>}</th><th>EOF</th></tr></thead>
+        <tbody>
+          <tr><td><strong>programa</strong></td><td>sentencia*</td><td>sentencia*</td><td>sentencia*</td><td>sentencia*</td><td>sentencia*</td><td>sentencia*</td><td>ε</td><td>ε</td></tr>
+          <tr><td><strong>sentencia</strong></td><td>declaracion</td><td>si_stmt</td><td>mientras_stmt</td><td>asignacion</td><td>escribir_stmt</td><td>leer_stmt</td><td>—</td><td>—</td></tr>
+          <tr><td><strong>declaracion</strong></td><td>var ID=expr;</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td><strong>asignacion</strong></td><td>—</td><td>—</td><td>—</td><td>ID=expr;</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td><strong>si_stmt</strong></td><td>—</td><td>si(c){s*}...</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td><strong>mientras_stmt</strong></td><td>—</td><td>—</td><td>mient(c){s*}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td><strong>expresion</strong></td><td>—</td><td>—</td><td>—</td><td>termino...</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Conjuntos FIRST y FOLLOW</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>No Terminal</th><th>FIRST ( α )</th><th>FOLLOW ( A )</th></tr></thead>
+        <tbody>
+          <tr><td><strong>programa</strong></td><td>var, si, mientras, escribir, leer, ID, EOF</td><td>EOF</td></tr>
+          <tr><td><strong>sentencia</strong></td><td>var, si, mientras, escribir, leer, ID</td><td>}, EOF</td></tr>
+          <tr><td><strong>declaracion</strong></td><td>var</td><td>var, si, mientras, escribir, leer, ID, }</td></tr>
+          <tr><td><strong>asignacion</strong></td><td>ID</td><td>var, si, mientras, escribir, leer, ID, }</td></tr>
+          <tr><td><strong>si_stmt</strong></td><td>si</td><td>var, si, mientras, escribir, leer, ID, }, EOF</td></tr>
+          <tr><td><strong>mientras_stmt</strong></td><td>mientras</td><td>var, si, mientras, escribir, leer, ID, }, EOF</td></tr>
+          <tr><td><strong>expresion</strong></td><td>ENTERO, DECIMAL, CADENA, BOOL, ID, (</td><td>; ) , == != &lt; &gt; &lt;= &gt;=</td></tr>
+          <tr><td><strong>termino</strong></td><td>ENTERO, DECIMAL, CADENA, BOOL, ID, (</td><td>+ - ; ) , op_rel</td></tr>
+          <tr><td><strong>factor</strong></td><td>ENTERO, DECIMAL, CADENA, BOOL, ID, (</td><td>* / % + - ; ) op_rel</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Control de Errores Sintácticos</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Tipo de Error</th><th>Descripción</th><th>Ejemplo</th><th>Estrategia de Recuperación</th></tr></thead>
+        <tbody>
+          <tr><td>Token inesperado</td><td>Se encontró un token no esperado según la gramática</td><td><code>si x &gt; 5 {</code> (falta paréntesis)</td><td>Inserción de token faltante</td></tr>
+          <tr><td>Sentencia incompleta</td><td>Falta el punto y coma al final</td><td><code>var x = 10</code></td><td>Modo pánico — avanzar hasta ;</td></tr>
+          <tr><td>Bloque no cerrado</td><td>Falta la llave de cierre</td><td><code>si (x > 0) { escribir(x);</code></td><td>Sincronización en EOF o }</td></tr>
+          <tr><td>Factor inválido</td><td>Expresión no reconocida</td><td><code>var x = @5;</code></td><td>Saltar hasta siguiente ;</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB AST ═══ -->
+<div id="tab-ast" class="panel">
+  <div class="hero">
+    <h1>Árbol de Análisis Sintáctico — Visual</h1>
+    <p>Representación gráfica top-down del árbol AST generado a partir del código fuente MiniLang de ejemplo.</p>
+  </div>
+  <div class="card">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#fce7f3;border:1.5px solid #f43f7a"></div>programa / raíz</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#dbeafe;border:1.5px solid #3b82f6"></div>sentencias</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#d1fae5;border:1.5px solid #059669"></div>expresión / condición</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fef3c7;border:1.5px solid #d97706"></div>terminal / valor</div>
+    </div>
+    <div class="ast-wrap">
+      <svg width="100%" viewBox="0 0 1000 820" xmlns="http://www.w3.org/2000/svg" style="font-family:'Nunito',sans-serif;font-size:12px">
+        <defs>
+          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(244,63,122,0.15)"/>
+          </filter>
+        </defs>
+
+        <!-- ROOT -->
+        <rect x="400" y="10" width="140" height="36" rx="10" fill="#fce7f3" stroke="#f43f7a" stroke-width="1.5" filter="url(#shadow)"/>
+        <text x="470" y="28" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#be185d" font-size="13">programa</text>
+
+        <!-- lines to L1 -->
+        <line x1="445" y1="46" x2="90" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
+        <line x1="458" y1="46" x2="252" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
+        <line x1="475" y1="46" x2="444" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
+        <line x1="500" y1="46" x2="682" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
+        <line x1="525" y1="46" x2="882" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
+
+        <!-- L1 nodes -->
+        <rect x="28" y="94" width="122" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="89" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">declaracion</text>
+        <rect x="188" y="94" width="122" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="249" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">declaracion</text>
+        <rect x="378" y="94" width="122" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="439" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">declaracion</text>
+        <rect x="630" y="94" width="100" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="680" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">si_stmt</text>
+        <rect x="838" y="94" width="100" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="888" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">mientras</text>
+
+        <!-- var x -->
+        <line x1="70" y1="124" x2="40" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="89" y1="124" x2="89" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="108" y1="124" x2="138" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="16" y="162" width="46" height="24" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="39" y="174" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11" font-weight="700">var</text>
+        <rect x="64" y="162" width="46" height="24" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="87" y="174" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="112" y="162" width="54" height="24" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="0.9"/>
+        <text x="139" y="174" text-anchor="middle" dominant-baseline="central" fill="#064e3b" font-size="11">ENTERO</text>
+        <line x1="139" y1="186" x2="139" y2="206" stroke="#059669" stroke-width="0.7"/>
+        <rect x="112" y="206" width="54" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="139" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">10</text>
+
+        <!-- var y -->
+        <line x1="230" y1="124" x2="204" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="249" y1="124" x2="249" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="268" y1="124" x2="294" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="180" y="162" width="46" height="24" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="203" y="174" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11" font-weight="700">var</text>
+        <rect x="226" y="162" width="46" height="24" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="249" y="174" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: y</text>
+        <rect x="272" y="162" width="58" height="24" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="0.9"/>
+        <text x="301" y="174" text-anchor="middle" dominant-baseline="central" fill="#064e3b" font-size="11">DECIMAL</text>
+        <line x1="301" y1="186" x2="301" y2="206" stroke="#059669" stroke-width="0.7"/>
+        <rect x="274" y="206" width="54" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="301" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">3.14</text>
+
+        <!-- var nombre -->
+        <line x1="418" y1="124" x2="392" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="439" y1="124" x2="439" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="460" y1="124" x2="488" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="366" y="162" width="46" height="24" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="389" y="174" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11" font-weight="700">var</text>
+        <rect x="410" y="162" width="66" height="24" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="443" y="174" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID:nombre</text>
+        <rect x="464" y="162" width="58" height="24" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="0.9"/>
+        <text x="493" y="174" text-anchor="middle" dominant-baseline="central" fill="#064e3b" font-size="11">CADENA</text>
+        <line x1="493" y1="186" x2="493" y2="206" stroke="#059669" stroke-width="0.7"/>
+        <rect x="455" y="206" width="78" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="494" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">"MiniLang"</text>
+
+        <!-- si_stmt branches -->
+        <line x1="655" y1="124" x2="612" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="680" y1="124" x2="712" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="705" y1="124" x2="804" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
+
+        <!-- condicion x>5 -->
+        <rect x="564" y="272" width="96" height="30" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="612" y="287" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#065f46" font-size="12">condición</text>
+        <text x="612" y="308" text-anchor="middle" fill="#6b7280" font-size="11">x &gt; 5</text>
+        <line x1="594" y1="304" x2="578" y2="338" stroke="#059669" stroke-width="0.7"/>
+        <line x1="612" y1="308" x2="612" y2="338" stroke="#059669" stroke-width="0.7"/>
+        <line x1="630" y1="304" x2="645" y2="338" stroke="#059669" stroke-width="0.7"/>
+        <rect x="554" y="338" width="46" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="577" y="349" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="598" y="338" width="28" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="612" y="349" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">&gt;</text>
+        <rect x="630" y="338" width="28" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="644" y="349" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">5</text>
+
+        <!-- cuerpo_si -->
+        <rect x="670" y="272" width="84" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="712" y="287" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">cuerpo_si</text>
+        <line x1="695" y1="302" x2="670" y2="338" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="726" y1="302" x2="752" y2="338" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="638" y="338" width="66" height="26" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="0.9"/>
+        <text x="671" y="351" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="11">escribir</text>
+        <line x1="671" y1="364" x2="671" y2="386" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="635" y="386" width="72" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="671" y="397" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: nombre</text>
+        <rect x="724" y="338" width="66" height="26" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="0.9"/>
+        <text x="757" y="351" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="11">asignacion</text>
+        <line x1="742" y1="364" x2="728" y2="386" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="757" y1="364" x2="757" y2="386" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="706" y="386" width="42" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="727" y="397" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="746" y="386" width="56" height="22" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="0.9"/>
+        <text x="774" y="397" text-anchor="middle" dominant-baseline="central" fill="#064e3b" font-size="11">expr (+)</text>
+        <line x1="760" y1="408" x2="748" y2="428" stroke="#059669" stroke-width="0.7"/>
+        <line x1="774" y1="408" x2="787" y2="428" stroke="#059669" stroke-width="0.7"/>
+        <rect x="728" y="428" width="42" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="749" y="439" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="774" y="428" width="30" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="789" y="439" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">1</text>
+
+        <!-- cuerpo_sino -->
+        <rect x="772" y="272" width="84" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="814" y="287" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">cuerpo_sino</text>
+        <line x1="814" y1="302" x2="814" y2="338" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="780" y="338" width="68" height="26" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="0.9"/>
+        <text x="814" y="351" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="11">escribir</text>
+        <line x1="814" y1="364" x2="814" y2="386" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="772" y="386" width="82" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="813" y="397" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">"menor"</text>
+
+        <!-- MIENTRAS -->
+        <line x1="870" y1="124" x2="852" y2="582" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="900" y1="124" x2="922" y2="582" stroke="#93c5fd" stroke-width="0.7"/>
+
+        <rect x="802" y="582" width="96" height="30" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="850" y="597" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#065f46" font-size="12">condición</text>
+        <text x="850" y="618" text-anchor="middle" fill="#6b7280" font-size="11">x &lt; 20</text>
+        <line x1="832" y1="614" x2="816" y2="644" stroke="#059669" stroke-width="0.7"/>
+        <line x1="850" y1="618" x2="850" y2="644" stroke="#059669" stroke-width="0.7"/>
+        <line x1="868" y1="614" x2="882" y2="644" stroke="#059669" stroke-width="0.7"/>
+        <rect x="792" y="644" width="46" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="815" y="655" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="836" y="644" width="28" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="850" y="655" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">&lt;</text>
+        <rect x="868" y="644" width="30" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="883" y="655" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">20</text>
+
+        <rect x="900" y="582" width="84" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
+        <text x="942" y="597" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">cuerpo</text>
+        <line x1="942" y1="612" x2="942" y2="644" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="906" y="644" width="72" height="26" rx="6" fill="#dbeafe" stroke="#3b82f6" stroke-width="0.9"/>
+        <text x="942" y="657" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="11">asignacion</text>
+        <line x1="928" y1="670" x2="914" y2="692" stroke="#93c5fd" stroke-width="0.7"/>
+        <line x1="942" y1="670" x2="942" y2="692" stroke="#93c5fd" stroke-width="0.7"/>
+        <rect x="892" y="692" width="42" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="913" y="703" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="934" y="692" width="56" height="22" rx="6" fill="#d1fae5" stroke="#059669" stroke-width="0.9"/>
+        <text x="962" y="703" text-anchor="middle" dominant-baseline="central" fill="#064e3b" font-size="11">expr (+)</text>
+        <line x1="946" y1="714" x2="934" y2="736" stroke="#059669" stroke-width="0.7"/>
+        <line x1="962" y1="714" x2="974" y2="736" stroke="#059669" stroke-width="0.7"/>
+        <rect x="912" y="736" width="42" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="933" y="747" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
+        <rect x="958" y="736" width="28" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
+        <text x="972" y="747" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">2</text>
+
+        <!-- source code box -->
+        <rect x="20" y="690" width="550" height="108" rx="10" fill="#fff0f5" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="36" y="710" fill="#be185d" font-size="10.5" font-weight="800">📝 Código fuente analizado:</text>
+        <text x="36" y="728" fill="#374151" font-family="'DM Mono',monospace" font-size="11">var x=10;  var y=3.14;  var nombre="MiniLang";</text>
+        <text x="36" y="746" fill="#374151" font-family="'DM Mono',monospace" font-size="11">si (x &gt; 5) &#123; escribir(nombre); x = x+1; &#125;</text>
+        <text x="36" y="764" fill="#374151" font-family="'DM Mono',monospace" font-size="11">sino &#123; escribir("menor"); &#125;</text>
+        <text x="36" y="782" fill="#374151" font-family="'DM Mono',monospace" font-size="11">mientras (x &lt; 20) &#123; x = x + 2; &#125;</text>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB TEORÍA BNF ═══ -->
+<div id="tab-teoria" class="panel">
+  <div class="hero">
+    <h1>📐 Gramática BNF y Diagrama de Conway</h1>
+    <p>La gramática formal en notación BNF (Backus-Naur Form) y los diagramas de Conway (railroad diagrams) que representan visualmente las reglas de producción de MiniLang.</p>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Gramática BNF Completa — MiniLang</div>
+    <div class="bnf-box">&lt;programa&gt;      ::= { &lt;sentencia&gt; } EOF
+
+&lt;sentencia&gt;     ::= &lt;declaracion&gt;
+                  | &lt;asignacion&gt;
+                  | &lt;si&gt;
+                  | &lt;mientras&gt;
+                  | &lt;escribir&gt;
+                  | &lt;leer&gt;
+
+&lt;declaracion&gt;   ::= 'var' &lt;ID&gt; '=' &lt;expresion&gt; ';'
+
+&lt;asignacion&gt;    ::= &lt;ID&gt; '=' &lt;expresion&gt; ';'
+
+&lt;si&gt;            ::= 'si' '(' &lt;condicion&gt; ')' '{' { &lt;sentencia&gt; } '}'
+                    [ 'sino' '{' { &lt;sentencia&gt; } '}' ]
+
+&lt;mientras&gt;      ::= 'mientras' '(' &lt;condicion&gt; ')' '{' { &lt;sentencia&gt; } '}'
+
+&lt;escribir&gt;      ::= 'escribir' '(' &lt;expresion&gt; ')' ';'
+
+&lt;leer&gt;          ::= 'leer' '(' &lt;ID&gt; ')' ';'
+
+&lt;expresion&gt;     ::= &lt;termino&gt; { ('+' | '-') &lt;termino&gt; }
+
+&lt;termino&gt;       ::= &lt;factor&gt; { ('*' | '/' | '%') &lt;factor&gt; }
+
+&lt;factor&gt;        ::= ENTERO
+                  | DECIMAL
+                  | CADENA
+                  | BOOLEANO
+                  | ID
+                  | '(' &lt;expresion&gt; ')'
+
+&lt;condicion&gt;     ::= &lt;expresion&gt; OP_REL &lt;expresion&gt;
+                  | &lt;expresion&gt; OP_LOG &lt;expresion&gt;
+                  | '!' &lt;condicion&gt;
+
+OP_REL          ::= '==' | '!=' | '&lt;' | '&gt;' | '&lt;=' | '&gt;='
+OP_LOG          ::= '&amp;&amp;' | '||'</div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Diagrama de Conway (Railroad Diagrams)</div>
+    <div class="conway-wrap">
+      <svg width="100%" viewBox="0 0 900 360" xmlns="http://www.w3.org/2000/svg" style="font-family:'Nunito',sans-serif;font-size:11px">
+        <!-- declaracion -->
+        <text x="8" y="26" fill="#9d6b81" font-size="10" font-weight="800" text-transform="uppercase">declaracion</text>
+        <line x1="8" y1="38" x2="30" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="30" y="29" width="38" height="18" rx="5" fill="#fce7f3" stroke="#f43f7a" stroke-width="1.2"/>
+        <text x="49" y="38" text-anchor="middle" dominant-baseline="central" fill="#be185d" font-weight="800">var</text>
+        <line x1="68" y1="38" x2="84" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="84" y="29" width="36" height="18" rx="5" fill="#d1fae5" stroke="#059669" stroke-width="1.2"/>
+        <text x="102" y="38" text-anchor="middle" dominant-baseline="central" fill="#065f46">ID</text>
+        <line x1="120" y1="38" x2="136" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="136" y="29" width="24" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="148" y="38" text-anchor="middle" dominant-baseline="central" fill="#475569">=</text>
+        <line x1="160" y1="38" x2="176" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="176" y="29" width="62" height="18" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="207" y="38" text-anchor="middle" dominant-baseline="central" fill="#5b21b6">expresion</text>
+        <line x1="238" y1="38" x2="254" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="254" y="29" width="22" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="265" y="38" text-anchor="middle" dominant-baseline="central" fill="#475569">;</text>
+        <line x1="276" y1="38" x2="302" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
+        <polygon points="298,34 306,38 298,42" fill="#f43f7a"/>
+
+        <!-- si_stmt -->
+        <text x="8" y="78" fill="#9d6b81" font-size="10" font-weight="800">si_stmt</text>
+        <line x1="8" y1="90" x2="30" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="30" y="81" width="24" height="18" rx="5" fill="#fce7f3" stroke="#f43f7a" stroke-width="1.2"/>
+        <text x="42" y="90" text-anchor="middle" dominant-baseline="central" fill="#be185d" font-weight="800">si</text>
+        <line x1="54" y1="90" x2="70" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="70" y="81" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="79" y="90" text-anchor="middle" dominant-baseline="central" fill="#475569">(</text>
+        <line x1="88" y1="90" x2="104" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="104" y="81" width="60" height="18" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="134" y="90" text-anchor="middle" dominant-baseline="central" fill="#5b21b6">condicion</text>
+        <line x1="164" y1="90" x2="180" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="180" y="81" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="189" y="90" text-anchor="middle" dominant-baseline="central" fill="#475569">)</text>
+        <line x1="198" y1="90" x2="214" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="214" y="81" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="223" y="90" text-anchor="middle" dominant-baseline="central" fill="#475569">{</text>
+        <line x1="232" y1="90" x2="248" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="248" y="81" width="58" height="18" rx="5" fill="#d1fae5" stroke="#059669" stroke-width="1.2"/>
+        <text x="277" y="90" text-anchor="middle" dominant-baseline="central" fill="#065f46">sentencia*</text>
+        <line x1="306" y1="90" x2="322" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="322" y="81" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="331" y="90" text-anchor="middle" dominant-baseline="central" fill="#475569">}</text>
+        <!-- sino optional -->
+        <path d="M349,90 Q359,90 359,106 L359,120 Q359,130 369,130 L464,130 Q474,130 474,120 L474,106 Q474,96 484,94 L492,94" fill="none" stroke="#f9a8d4" stroke-width="1.2" stroke-dasharray="5,3"/>
+        <rect x="369" y="120" width="96" height="18" rx="5" fill="#fef3c7" stroke="#d97706" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="417" y="129" text-anchor="middle" dominant-baseline="central" fill="#92400e">sino { s* }</text>
+        <path d="M349,90 Q359,90 359,74 L359,60 Q359,50 369,50 L468,50 Q478,50 478,60 L478,74 Q478,84 488,86 L494,86" fill="none" stroke="#f9a8d4" stroke-width="1.5"/>
+        <polygon points="490,82 498,86 490,90" fill="#f43f7a"/>
+
+        <!-- expresion -->
+        <text x="8" y="168" fill="#9d6b81" font-size="10" font-weight="800">expresion</text>
+        <line x1="8" y1="180" x2="30" y2="180" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="30" y="171" width="50" height="18" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="55" y="180" text-anchor="middle" dominant-baseline="central" fill="#5b21b6">termino</text>
+        <line x1="80" y1="180" x2="98" y2="180" stroke="#f9a8d4" stroke-width="1.5"/>
+        <path d="M98,180 Q108,180 108,168 L108,157 Q108,147 118,147 L162,147 Q172,147 172,157 L172,168 Q172,178 182,180" fill="none" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="116" y="138" width="48" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="140" y="147" text-anchor="middle" dominant-baseline="central" fill="#475569">+ | -</text>
+        <rect x="178" y="171" width="50" height="18" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="203" y="180" text-anchor="middle" dominant-baseline="central" fill="#5b21b6">termino</text>
+        <line x1="228" y1="180" x2="244" y2="180" stroke="#f9a8d4" stroke-width="1.5"/>
+        <polygon points="240,176 248,180 240,184" fill="#f43f7a"/>
+
+        <!-- mientras -->
+        <text x="8" y="228" fill="#9d6b81" font-size="10" font-weight="800">mientras_stmt</text>
+        <line x1="8" y1="240" x2="30" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="30" y="231" width="62" height="18" rx="5" fill="#fce7f3" stroke="#f43f7a" stroke-width="1.2"/>
+        <text x="61" y="240" text-anchor="middle" dominant-baseline="central" fill="#be185d" font-weight="800">mientras</text>
+        <line x1="92" y1="240" x2="108" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="108" y="231" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="117" y="240" text-anchor="middle" dominant-baseline="central" fill="#475569">(</text>
+        <line x1="126" y1="240" x2="142" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="142" y="231" width="60" height="18" rx="5" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="172" y="240" text-anchor="middle" dominant-baseline="central" fill="#5b21b6">condicion</text>
+        <line x1="202" y1="240" x2="218" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
+        <rect x="218" y="231" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="227" y="240" text-anchor="middle" dominant-baseline="central" fill="#475569">)</text>
+        <line x1="236" y1="240" x2="252" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
+        <!-- loop back arrow -->
+        <path d="M252,240 Q262,240 262,254 L262,266 Q262,276 252,276 L192,276 Q182,276 182,266 L182,254 Q182,244 172,240" fill="none" stroke="#f43f7a" stroke-width="1.5"/>
+        <polygon points="176,237 168,240 176,243" fill="#f43f7a"/>
+        <rect x="188" y="267" width="58" height="18" rx="5" fill="#d1fae5" stroke="#059669" stroke-width="1.2"/>
+        <text x="217" y="276" text-anchor="middle" dominant-baseline="central" fill="#065f46">sentencia*</text>
+        <rect x="268" y="231" width="18" height="18" rx="5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="277" y="240" text-anchor="middle" dominant-baseline="central" fill="#475569">}</text>
+        <line x1="286" y1="240" x2="304" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
+        <polygon points="300,236 308,240 300,244" fill="#f43f7a"/>
+
+        <!-- leyenda -->
+        <rect x="580" y="16" width="304" height="156" rx="10" fill="rgba(255,240,245,0.9)" stroke="#f9a8d4" stroke-width="1.5"/>
+        <text x="598" y="36" fill="#be185d" font-size="10.5" font-weight="800">LEYENDA — NOTACIÓN RAILROAD</text>
+        <rect x="598" y="46" width="18" height="12" rx="3" fill="#fce7f3" stroke="#f43f7a" stroke-width="1.2"/>
+        <text x="622" y="54" fill="#374151" font-size="10">Palabra reservada</text>
+        <rect x="598" y="64" width="18" height="12" rx="3" fill="#d1fae5" stroke="#059669" stroke-width="1.2"/>
+        <text x="622" y="72" fill="#374151" font-size="10">Identificador (terminal)</text>
+        <rect x="598" y="82" width="18" height="12" rx="3" fill="#ede9fe" stroke="#7c3aed" stroke-width="1.2"/>
+        <text x="622" y="90" fill="#374151" font-size="10">No terminal</text>
+        <rect x="598" y="100" width="18" height="12" rx="3" fill="#f1f5f9" stroke="#475569" stroke-width="1.2"/>
+        <text x="622" y="108" fill="#374151" font-size="10">Puntuación / delimitador</text>
+        <rect x="598" y="118" width="18" height="12" rx="3" fill="#d1fae5" stroke="#059669" stroke-width="1.2"/>
+        <text x="622" y="126" fill="#374151" font-size="10">Bloque de sentencias (cero o más)</text>
+        <rect x="598" y="136" width="18" height="12" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="1.2" stroke-dasharray="3,2"/>
+        <text x="622" y="144" fill="#374151" font-size="10">Camino opcional (sino)</text>
+        <text x="598" y="164" fill="#9d6b81" font-size="9.5" font-style="italic">→ Flechas loop = repetición (0 o más veces)</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Análisis Sintáctico Completo LL(1) — Bloque de Código Ejemplo</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Pila</th><th>Entrada restante</th><th>Acción</th><th>Producción aplicada</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>[$, programa]</td><td>var x = 10 ; ...</td><td>Expandir</td><td>programa → sentencia* EOF</td></tr>
+          <tr><td>2</td><td>[$, sentencia*]</td><td>var x = 10 ; ...</td><td>Expandir</td><td>sentencia → declaracion</td></tr>
+          <tr><td>3</td><td>[$, declaracion]</td><td>var x = 10 ; ...</td><td>Expandir</td><td>declaracion → var ID = expr ;</td></tr>
+          <tr><td>4</td><td>[$, var ID = expr ;]</td><td>var x = 10 ; ...</td><td>Consumir</td><td>Match: var</td></tr>
+          <tr><td>5</td><td>[$, ID = expr ;]</td><td>x = 10 ; ...</td><td>Consumir</td><td>Match: ID(x)</td></tr>
+          <tr><td>6</td><td>[$, = expr ;]</td><td>= 10 ; ...</td><td>Consumir</td><td>Match: =</td></tr>
+          <tr><td>7</td><td>[$, expr ;]</td><td>10 ; ...</td><td>Expandir</td><td>expr → termino → factor → ENTERO</td></tr>
+          <tr><td>8</td><td>[$, ENTERO ;]</td><td>10 ; ...</td><td>Consumir</td><td>Match: 10</td></tr>
+          <tr><td>9</td><td>[$, ;]</td><td>; ...</td><td>Consumir</td><td>Match: ;</td></tr>
+          <tr><td>10</td><td>[$, sentencia*]</td><td>var y = ...</td><td>Expandir</td><td>sentencia → declaracion</td></tr>
+          <tr><td>…</td><td>…</td><td>…</td><td>…</td><td>… (continúa para cada sentencia)</td></tr>
+          <tr><td>n</td><td>[$]</td><td>EOF</td><td>Aceptar</td><td>✅ Análisis exitoso</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<script>
+const KEYWORDS = new Set(['si','sino','mientras','var','fin','leer','escribir','retorna','verdadero','falso']);
+
+const samples = [
+`var x = 10;
+var y = 3.14;
+var nombre = "MiniLang";
+escribir(nombre);`,
+`// Condicional
+var edad = 18;
+si (edad >= 18) {
+    escribir("mayor de edad");
+} sino {
+    escribir("menor de edad");
+}`,
+`// Ciclo mientras
+var i = 0;
+var suma = 0;
+mientras (i < 10) {
+    suma = suma + i;
+    i = i + 1;
+}
+escribir(suma);`,
+`// Ejemplo con errores léxicos
+var 123abc = 5;
+var x = 10;
+x = x @ 2;
+escribir(x`
+];
+
+function loadSample(i) { document.getElementById('srcCode').value = samples[i]; }
+
+function showTab(name, el) {
+  document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+const tokRegex = {KW:'PALABRA_RESERVADA',ID:'IDENTIFICADOR',INT:'ENTERO',DEC:'DECIMAL',STR:'CADENA',BOOL:'BOOLEANO',OP:'OP_REL/ARITMÉTICO',ASSIGN:'OP_ASIGNACIÓN',PUN:'PUNTUACIÓN',ERR:'ERROR LÉXICO'};
+const tokRegexPat = {KW:'si|sino|mientras|var|...',ID:'[a-zA-Z_][a-zA-Z0-9_]*',INT:'[0-9]+',DEC:'[0-9]+\\.[0-9]+',STR:'"[^"]*"',BOOL:'verdadero|falso',OP:'[+\\-*/%]|==|!=|<=|>=|<|>',ASSIGN:'=(?!=)',PUN:'[;,(){}]',ERR:'—'};
+const cssClass = {KW:'tok-KW',ID:'tok-ID',INT:'tok-INT',DEC:'tok-DEC',STR:'tok-STR',BOOL:'tok-BOOL',OP:'tok-OP',ASSIGN:'tok-ASSIGN',PUN:'tok-PUN',ERR:'tok-ERR'};
+
+function tokenize(src) {
+  const tokens=[], errors=[];
+  let i=0, line=1;
+  while(i<src.length){
+    let c=src[i];
+    if(c==='\n'){line++;i++;continue;}
+    if(/\s/.test(c)){i++;continue;}
+    if(src[i]==='/'&&src[i+1]==='/'){while(i<src.length&&src[i]!=='\n')i++;continue;}
+    if(c==='"'){
+      let j=i+1;
+      while(j<src.length&&src[j]!=='"')j++;
+      if(j>=src.length){errors.push({line,msg:`Cadena sin cerrar en línea ${line}`});tokens.push({lex:src.slice(i),type:'ERR',line});i=j;}
+      else{tokens.push({lex:src.slice(i,j+1),type:'STR',line});i=j+1;}
+      continue;
+    }
+    if(/[0-9]/.test(c)){
+      let j=i;
+      while(j<src.length&&/[0-9]/.test(src[j]))j++;
+      if(src[j]==='.'&&/[0-9]/.test(src[j+1])){j++;while(j<src.length&&/[0-9]/.test(src[j]))j++;tokens.push({lex:src.slice(i,j),type:'DEC',line});}
+      else tokens.push({lex:src.slice(i,j),type:'INT',line});
+      i=j;continue;
+    }
+    if(/[a-zA-Z_]/.test(c)){
+      let j=i;
+      while(j<src.length&&/[a-zA-Z0-9_]/.test(src[j]))j++;
+      const lex=src.slice(i,j);
+      if(lex==='verdadero'||lex==='falso')tokens.push({lex,type:'BOOL',line});
+      else if(KEYWORDS.has(lex))tokens.push({lex,type:'KW',line});
+      else tokens.push({lex,type:'ID',line});
+      i=j;continue;
+    }
+    const two=src.slice(i,i+2);
+    if(['==','!=','<=','>=','&&','||'].includes(two)){tokens.push({lex:two,type:'OP',line});i+=2;continue;}
+    if('<>!'.includes(c)){tokens.push({lex:c,type:'OP',line});i++;continue;}
+    if('+-*/%'.includes(c)){tokens.push({lex:c,type:'OP',line});i++;continue;}
+    if(c==='='&&src[i+1]!=='='){tokens.push({lex:c,type:'ASSIGN',line});i++;continue;}
+    if(';,(){}'.includes(c)){tokens.push({lex:c,type:'PUN',line});i++;continue;}
+    errors.push({line,msg:`Token desconocido '${c}' en línea ${line}`});
+    tokens.push({lex:c,type:'ERR',line});
+    i++;
+  }
+  return {tokens,errors};
+}
+
+function runLexer(){
+  const src=document.getElementById('srcCode').value;
+  const {tokens,errors}=tokenize(src);
+  const lines=src.split('\n').length;
+  const ids=tokens.filter(t=>t.type==='ID');
+  document.getElementById('m-tokens').textContent=tokens.length;
+  document.getElementById('m-lines').textContent=lines;
+  document.getElementById('m-ids').textContent=ids.length;
+  document.getElementById('m-errs').textContent=errors.length;
+
+  // count uses
+  const useCnt={};
+  tokens.forEach(t=>{if(t.type==='ID')useCnt[t.lex]=(useCnt[t.lex]||0)+1;});
+
+  document.getElementById('tokBody').innerHTML=tokens.map((t,i)=>
+    `<tr><td style="color:#9d6b81;font-family:'DM Mono',monospace">${i+1}</td><td><code style="background:#fff0f5;padding:2px 8px;border-radius:5px;color:#be185d">${esc(t.lex)}</code></td><td><span class="tok ${cssClass[t.type]||'tok-PUN'}">${tokRegex[t.type]||t.type}</span></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#9d6b81">${tokRegexPat[t.type]||'—'}</td><td style="color:#6b7280">${t.line}</td></tr>`
+  ).join('');
+
+  const symMap={};
+  for(let j=0;j<tokens.length;j++){
+    if(tokens[j].type==='KW'&&tokens[j].lex==='var'&&tokens[j+1]?.type==='ID'){
+      const name=tokens[j+1].lex,ln=tokens[j+1].line;
+      let val='—',typ='desconocido';
+      if(tokens[j+2]?.type==='ASSIGN'&&tokens[j+3]){
+        const v=tokens[j+3];val=v.lex;
+        if(v.type==='INT')typ='entero';
+        else if(v.type==='DEC')typ='decimal';
+        else if(v.type==='STR')typ='cadena';
+        else if(v.type==='BOOL')typ='booleano';
+        else if(v.type==='ID')typ='referencia';
+      }
+      symMap[name]={typ,val,ln};
+    }
+  }
+  const entries=Object.entries(symMap);
+  document.getElementById('symBody').innerHTML=entries.length===0
+    ?'<tr><td colspan="5" style="text-align:center;color:#cca;padding:20px;font-style:italic">No se encontraron declaraciones de variables</td></tr>'
+    :entries.map(([name,{typ,val,ln}])=>
+      `<tr><td><code style="background:#fff0f5;padding:2px 8px;border-radius:5px;color:#be185d;font-family:'DM Mono',monospace">${name}</code></td><td><span class="chip chip-${typ==='entero'?'gold':typ==='decimal'?'gold':typ==='cadena'?'lilac':typ==='booleano'?'mint':'rose'}">${typ}</span></td><td><code style="font-family:'DM Mono',monospace">${esc(val)}</code></td><td>${ln}</td><td>${useCnt[name]||1}</td></tr>`
+    ).join('');
+
+  const errBox=document.getElementById('errBox');
+  if(errors.length>0){
+    errBox.className='error-box show';
+    errBox.innerHTML='<strong>⚠ Errores léxicos detectados:</strong><br>'+errors.map(e=>`• ${e.msg}`).join('<br>');
+    document.getElementById('lex-status').innerHTML=`<span class="fail-msg">✗ ${errors.length} error(es)</span>`;
+  } else {
+    errBox.className='error-box';
+    document.getElementById('lex-status').innerHTML=`<span class="success-msg">✓ ${tokens.length} tokens generados</span>`;
+  }
+}
+
+/* ── PARSER ── */
+let pos=0,toks=[];
+function cur(){return toks[pos]||{type:'EOF',lex:'EOF',line:-1};}
+function eat(type,lex){
+  const t=cur();
+  if(lex&&t.lex!==lex)throw new Error(`Se esperaba '${lex}' pero se encontró '${t.lex}' (línea ${t.line})`);
+  if(type&&!lex&&t.type!==type)throw new Error(`Se esperaba tipo ${type} pero se encontró '${t.lex}' (línea ${t.line})`);
+  pos++;return t;
+}
+function parseProgram(tokens){toks=tokens;pos=0;const s=[];while(pos<toks.length)s.push(parseStmt());return{type:'programa',children:s};}
+function parseStmt(){
+  const t=cur();
+  if(t.lex==='var')return parseDecl();
+  if(t.lex==='si')return parseSi();
+  if(t.lex==='mientras')return parseMientras();
+  if(t.lex==='escribir')return parseEscribir();
+  if(t.lex==='leer')return parseLeer();
+  if(t.type==='ID')return parseAsign();
+  throw new Error(`Sentencia inesperada '${t.lex}' en línea ${t.line}`);
+}
+function parseDecl(){eat(null,'var');const id=eat('ID');eat(null,'=');const expr=parseExpr();eat(null,';');return{type:'declaracion',id:id.lex,expr};}
+function parseAsign(){const id=eat('ID');eat(null,'=');const expr=parseExpr();eat(null,';');return{type:'asignacion',id:id.lex,expr};}
+function parseSi(){
+  eat(null,'si');eat(null,'(');const cond=parseCond();eat(null,')');eat(null,'{');
+  const body=[];while(cur().lex!=='}'&&pos<toks.length)body.push(parseStmt());eat(null,'}');
+  let elseBody=null;
+  if(cur().lex==='sino'){eat(null,'sino');eat(null,'{');elseBody=[];while(cur().lex!=='}'&&pos<toks.length)elseBody.push(parseStmt());eat(null,'}');}
+  return{type:'si',cond,body,elseBody};
+}
+function parseMientras(){
+  eat(null,'mientras');eat(null,'(');const cond=parseCond();eat(null,')');eat(null,'{');
+  const body=[];while(cur().lex!=='}'&&pos<toks.length)body.push(parseStmt());eat(null,'}');
+  return{type:'mientras',cond,body};
+}
+function parseEscribir(){eat(null,'escribir');eat(null,'(');const expr=parseExpr();eat(null,')');eat(null,';');return{type:'escribir',expr};}
+function parseLeer(){eat(null,'leer');eat(null,'(');const id=eat('ID');eat(null,')');eat(null,';');return{type:'leer',id:id.lex};}
+function parseCond(){const l=parseExpr();const op=cur();if(op.type==='OP'){pos++;const r=parseExpr();return{type:'condicion',op:op.lex,left:l,right:r};}return{type:'condicion',op:'',left:l,right:null};}
+function parseExpr(){let l=parseTerm();while(['+','-'].includes(cur().lex)){const op=cur().lex;pos++;const r=parseTerm();l={type:'expr',op,left:l,right:r};}return l;}
+function parseTerm(){let l=parseFactor();while(['*','/','%'].includes(cur().lex)){const op=cur().lex;pos++;const r=parseFactor();l={type:'term',op,left:l,right:r};}return l;}
+function parseFactor(){
+  const t=cur();
+  if(['INT','DEC','STR','BOOL'].includes(t.type)){pos++;return{type:'factor',val:t.lex,tokType:t.type};}
+  if(t.type==='ID'){pos++;return{type:'factor',val:t.lex,tokType:'ID'};}
+  if(t.lex==='('){eat(null,'(');const e=parseExpr();eat(null,')');return{type:'grupo',expr:e};}
+  throw new Error(`Factor inesperado '${t.lex}' en línea ${t.line}`);
+}
+
+function renderTree(node,prefix,isLast){
+  if(!node)return'';
+  const C=isLast?'└── ':'├── ',P=isLast?'    ':'│   ';
+  let s=prefix+C;
+  if(node.type==='programa'){s='programa\n';return s+(node.children||[]).map((c,i)=>renderTree(c,'',i===node.children.length-1)).join('');}
+  if(node.type==='declaracion'){s+=` declaracion (var ${node.id})\n`;s+=renderTree(node.expr,prefix+P,true);}
+  else if(node.type==='asignacion'){s+=` asignacion (${node.id} =)\n`;s+=renderTree(node.expr,prefix+P,true);}
+  else if(node.type==='si'){
+    s+=' si_stmt\n';
+    s+=renderTree(node.cond,prefix+P,false);
+    (node.body||[]).forEach((c,i)=>{s+=renderTree(c,prefix+P,i===node.body.length-1&&!node.elseBody);});
+    if(node.elseBody){s+=prefix+P+'└── sino\n';node.elseBody.forEach((c,i)=>{s+=renderTree(c,prefix+P+'    ',i===node.elseBody.length-1);});}
+  }
+  else if(node.type==='mientras'){
+    s+=' mientras_stmt\n';
+    s+=renderTree(node.cond,prefix+P,false);
+    (node.body||[]).forEach((c,i)=>{s+=renderTree(c,prefix+P,i===node.body.length-1);});
+  }
+  else if(node.type==='escribir'){s+=' escribir_stmt\n';s+=renderTree(node.expr,prefix+P,true);}
+  else if(node.type==='leer'){s+=` leer_stmt (${node.id})\n`;}
+  else if(node.type==='condicion'){s+=` condicion (${node.op||'bool'})\n`;if(node.left)s+=renderTree(node.left,prefix+P,!node.right);if(node.right)s+=renderTree(node.right,prefix+P,true);}
+  else if(node.type==='expr'||node.type==='term'){s+=` op (${node.op})\n`;s+=renderTree(node.left,prefix+P,false);s+=renderTree(node.right,prefix+P,true);}
+  else if(node.type==='factor'){s+=` factor → ${node.tokType}: ${node.val}\n`;}
+  else if(node.type==='grupo'){s+='( grupo )\n';s+=renderTree(node.expr,prefix+P,true);}
+  else{s+=JSON.stringify(node)+'\n';}
+  return s;
+}
+
+function runParser(){
+  const src=document.getElementById('srcCode').value;
+  const{tokens,errors:lexErrs}=tokenize(src);
+  const treeBox=document.getElementById('treeBox'),synErrBox=document.getElementById('synErrBox');
+  if(lexErrs.length>0){
+    synErrBox.className='error-box show';
+    synErrBox.innerHTML='<strong>⚠ Corrige primero los errores léxicos antes de analizar sintácticamente.</strong>';
+    treeBox.textContent='No se puede generar el árbol con errores léxicos presentes.';
+    document.getElementById('syn-status').innerHTML=`<span class="fail-msg">✗ Errores léxicos presentes</span>`;
+    return;
+  }
+  try{
+    const tree=parseProgram(tokens);
+    treeBox.textContent=renderTree(tree,'',true);
+    synErrBox.className='error-box';
+    document.getElementById('syn-status').innerHTML=`<span class="success-msg">✓ Árbol generado correctamente</span>`;
+  }catch(e){
+    synErrBox.className='error-box show';
+    synErrBox.innerHTML=`<strong>⚠ Error sintáctico:</strong> ${esc(e.message)}`;
+    treeBox.textContent='Error al generar el árbol.';
+    document.getElementById('syn-status').innerHTML=`<span class="fail-msg">✗ Error sintáctico</span>`;
+  }
+}
+
+function clearAll(){
+  document.getElementById('srcCode').value='';
+  document.getElementById('tokBody').innerHTML='<tr><td colspan="5" style="text-align:center;color:#cca;padding:22px;font-style:italic">Ejecuta el análisis para ver los tokens...</td></tr>';
+  document.getElementById('symBody').innerHTML='<tr><td colspan="5" style="text-align:center;color:#cca;padding:22px;font-style:italic">Ejecuta el análisis para ver la tabla de símbolos...</td></tr>';
+  ['m-tokens','m-lines','m-ids','m-errs'].forEach(id=>document.getElementById(id).textContent='—');
+  document.getElementById('errBox').className='error-box';
+  document.getElementById('lex-status').innerHTML='';
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+
+<div style="margin:40px auto 20px auto;padding:16px;text-align:center;
+font-family:'Nunito',sans-serif;
+color:#6b3a52;
+font-size:14px;
+border-top:1px solid #f5c6d8;
+max-width:1200px;">
+Aplicación desarrollada por la estudiante de Ingeniería en Sistemas<br>
+<strong>Irma Yaritza Katiuxca Jagan Xol</strong>
+</div>
+
+</body>
+</html>
