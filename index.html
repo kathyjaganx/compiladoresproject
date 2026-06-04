@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MiniLang Compiler — Diseño de Lenguaje de Programación</title>
+<title>Flor Compiler — Diseño de Lenguaje de Programación</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -437,8 +437,8 @@ tr:hover td { background: #fff0f5; }
 <!-- ═══ TAB LÉXICO ═══ -->
 <div id="tab-lexico" class="panel active">
   <div class="hero">
-    <h1>🌸 Analizador Léxico — MiniLang</h1>
-    <p>Identifica y clasifica cada token del código fuente según las categorías léxicas definidas. Ingresa código MiniLang y presiona <strong>Analizar</strong> para ver la tabla de símbolos, tokens generados y errores detectados.</p>
+    <h1>🌸 Analizador Léxico — Flor</h1>
+    <p>Identifica y clasifica cada token del código fuente según las categorías léxicas definidas. Ingresa código Flor y presiona <strong>Analizar</strong> para ver la tabla de símbolos, tokens generados y errores detectados.</p>
     <div class="hero-chips">
       <span class="chip chip-rose">Identificadores</span>
       <span class="chip chip-lilac">Palabras Reservadas</span>
@@ -448,7 +448,7 @@ tr:hover td { background: #fff0f5; }
   </div>
 
   <div class="card">
-    <div class="section-label">Código Fuente MiniLang</div>
+    <div class="section-label">Código Fuente Flor</div>
     <div class="samples">
       <button class="sample-btn" onclick="loadSample(0)">📋 Ejemplo Completo</button>
       <button class="sample-btn" onclick="loadSample(1)">🔀 Condicional</button>
@@ -457,7 +457,7 @@ tr:hover td { background: #fff0f5; }
     </div>
     <textarea id="srcCode" spellcheck="false">var x = 10;
 var y = 3.14;
-var nombre = "MiniLang";
+var nombre = "Flor";
 escribir(nombre);</textarea>
     <div class="btn-row">
       <button class="btn primary" onclick="runLexer()">▶ Analizar Código</button>
@@ -806,7 +806,7 @@ escribir(nombre);</textarea>
 <div id="tab-ast" class="panel">
   <div class="hero">
     <h1>Árbol de Análisis Sintáctico — Visual</h1>
-    <p>Representación gráfica top-down del árbol AST generado a partir del código fuente MiniLang de ejemplo.</p>
+    <p>Representación gráfica top-down del árbol AST generado a partir del código fuente Flor de ejemplo.</p>
   </div>
   <div class="card">
     <div class="legend">
@@ -886,7 +886,7 @@ escribir(nombre);</textarea>
         <text x="493" y="174" text-anchor="middle" dominant-baseline="central" fill="#064e3b" font-size="11">CADENA</text>
         <line x1="493" y1="186" x2="493" y2="206" stroke="#059669" stroke-width="0.7"/>
         <rect x="455" y="206" width="78" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
-        <text x="494" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">"MiniLang"</text>
+        <text x="494" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">"Flor"</text>
 
         <!-- si_stmt branches -->
         <line x1="655" y1="124" x2="612" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
@@ -980,7 +980,7 @@ escribir(nombre);</textarea>
         <!-- source code box -->
         <rect x="20" y="690" width="550" height="108" rx="10" fill="#fff0f5" stroke="#f9a8d4" stroke-width="1.5"/>
         <text x="36" y="710" fill="#be185d" font-size="10.5" font-weight="800">📝 Código fuente analizado:</text>
-        <text x="36" y="728" fill="#374151" font-family="'DM Mono',monospace" font-size="11">var x=10;  var y=3.14;  var nombre="MiniLang";</text>
+        <text x="36" y="728" fill="#374151" font-family="'DM Mono',monospace" font-size="11">var x=10;  var y=3.14;  var nombre="Flor";</text>
         <text x="36" y="746" fill="#374151" font-family="'DM Mono',monospace" font-size="11">si (x &gt; 5) &#123; escribir(nombre); x = x+1; &#125;</text>
         <text x="36" y="764" fill="#374151" font-family="'DM Mono',monospace" font-size="11">sino &#123; escribir("menor"); &#125;</text>
         <text x="36" y="782" fill="#374151" font-family="'DM Mono',monospace" font-size="11">mientras (x &lt; 20) &#123; x = x + 2; &#125;</text>
@@ -993,11 +993,11 @@ escribir(nombre);</textarea>
 <div id="tab-teoria" class="panel">
   <div class="hero">
     <h1>📐 Gramática BNF y Diagrama de Conway</h1>
-    <p>La gramática formal en notación BNF (Backus-Naur Form) y los diagramas de Conway (railroad diagrams) que representan visualmente las reglas de producción de MiniLang.</p>
+    <p>La gramática formal en notación BNF (Backus-Naur Form) y los diagramas de Conway (railroad diagrams) que representan visualmente las reglas de producción de Flor.</p>
   </div>
 
   <div class="card">
-    <div class="section-label">Gramática BNF Completa — MiniLang</div>
+    <div class="section-label">Gramática BNF Completa — Flor</div>
     <div class="bnf-box">&lt;programa&gt;      ::= { &lt;sentencia&gt; } EOF
 
 &lt;sentencia&gt;     ::= &lt;declaracion&gt;
@@ -1184,7 +1184,7 @@ const KEYWORDS = new Set(['si','sino','mientras','var','fin','leer','escribir','
 const samples = [
 `var x = 10;
 var y = 3.14;
-var nombre = "MiniLang";
+var nombre = "Flor";
 escribir(nombre);`,
 `// Condicional
 var edad = 18;
