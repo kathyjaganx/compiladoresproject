@@ -1,3 +1,6 @@
+
+raw
+Index · HTML
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -31,9 +34,249 @@
   --border: #f5c6d8;
   --shadow: rgba(244,63,122,0.12);
 }
-
+ 
+/* LOGIN*/
+.login-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #fff0f5 0%, #fce7f3 40%, #ede9fe 60%, #e9d5ff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  font-family: 'Nunito', sans-serif;
+  backdrop-filter: blur(10px);
+  animation: loginFadeIn 0.6s ease;
+}
+ 
+@keyframes loginFadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+ 
+.login-screen.hidden {
+  display: none;
+}
+ 
+.login-container {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(244, 63, 122, 0.25), 0 0 100px rgba(168, 85, 247, 0.1);
+  border: 2px solid rgba(245, 198, 216, 0.5);
+  padding: 0;
+  max-width: 420px;
+  width: 90%;
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  animation: slideUp 0.5s ease;
+}
+ 
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+ 
+.login-header {
+  background: linear-gradient(135deg, #f43f7a 0%, #e11d62 100%);
+  color: white;
+  padding: 40px 28px 32px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+ 
+.login-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+ 
+.login-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+ 
+.login-logo {
+  font-size: 48px;
+  margin-bottom: 12px;
+  animation: float 3s ease-in-out infinite;
+  z-index: 1;
+  position: relative;
+}
+ 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+ 
+.login-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px;
+  margin: 0;
+  font-weight: bold;
+  position: relative;
+  z-index: 1;
+}
+ 
+.login-subtitle {
+  font-size: 13px;
+  opacity: 0.95;
+  margin-top: 8px;
+  position: relative;
+  z-index: 1;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+ 
+.login-body {
+  padding: 36px 28px 32px;
+}
+ 
+.login-university {
+  text-align: center;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #fce7f3;
+}
+ 
+.login-university-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e11d62;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 6px 0;
+}
+ 
+.login-university-detail {
+  font-size: 11px;
+  color: #9d6b81;
+  font-style: italic;
+}
+ 
+.login-form-group {
+  margin-bottom: 16px;
+}
+ 
+.login-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #6b3a52;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+ 
+.login-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #f5c6d8;
+  border-radius: 10px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  color: #1a0a14;
+  background: rgba(255, 240, 245, 0.5);
+  transition: all 0.3s;
+  box-sizing: border-box;
+}
+ 
+.login-input:focus {
+  outline: none;
+  border-color: #f43f7a;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(244, 63, 122, 0.1);
+}
+ 
+.login-input::placeholder {
+  color: #9d6b81;
+}
+ 
+.login-btn {
+  width: 100%;
+  padding: 13px 16px;
+  background: linear-gradient(135deg, #f43f7a 0%, #e11d62 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Nunito', sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 8px;
+  box-shadow: 0 4px 15px rgba(244, 63, 122, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+ 
+.login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 63, 122, 0.4);
+}
+ 
+.login-btn:active {
+  transform: translateY(0);
+}
+ 
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+ 
+.login-error {
+  padding: 10px 12px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 12px;
+  margin-bottom: 12px;
+  display: none;
+  animation: shake 0.3s;
+}
+ 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+ 
+.login-error.show {
+  display: block;
+}
+ 
+.login-footer {
+  padding: 20px 28px;
+  background: rgba(252, 231, 243, 0.3);
+  border-top: 1px solid #f5c6d8;
+  text-align: center;
+  font-size: 11px;
+  color: #9d6b81;
+  line-height: 1.6;
+}
+ 
+.login-footer-strong {
+  font-weight: 600;
+  color: #e11d62;
+}
+ 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
 body {
   font-family: 'Nunito', sans-serif;
   background: var(--rose-50);
@@ -44,7 +287,7 @@ body {
     radial-gradient(ellipse at 90% 80%, rgba(233,213,255,0.4) 0%, transparent 50%),
     radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.3) 0%, transparent 70%);
 }
-
+ 
 /* ── HEADER ── */
 .header {
   background: linear-gradient(135deg, #fff0f5 0%, #fce7f3 40%, #ede9fe 100%);
@@ -79,7 +322,7 @@ body {
 }
 .logo-text { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--rose-600); letter-spacing: -0.5px; }
 .logo-sub { font-size: 11px; color: var(--text-soft); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
-
+ 
 .nav {
   display: flex;
   gap: 4px;
@@ -108,13 +351,13 @@ body {
   box-shadow: 0 4px 12px rgba(236,72,153,0.35);
 }
 .nav-btn:hover:not(.active) { background: var(--rose-100); color: var(--rose-600); }
-
+ 
 /* ── LAYOUT ── */
 .app { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
 .panel { display: none; }
 .panel.active { display: block; animation: fadeUp .35s ease; }
 @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-
+ 
 /* ── CARDS ── */
 .card {
   background: rgba(255,255,255,0.85);
@@ -127,7 +370,7 @@ body {
   transition: box-shadow .2s;
 }
 .card:hover { box-shadow: 0 6px 32px rgba(236,72,153,0.15); }
-
+ 
 .card-title {
   font-family: 'DM Serif Display', serif;
   font-size: 16px;
@@ -154,7 +397,7 @@ body {
   height: 1px;
   background: linear-gradient(to right, var(--border), transparent);
 }
-
+ 
 /* ── HERO (intro) ── */
 .hero {
   background: linear-gradient(135deg, #fff0f5, #fce7f3, #ede9fe);
@@ -186,7 +429,7 @@ body {
 .chip-lilac { background: var(--lilac); color: var(--lilac-deep); border: 1px solid #d8b4fe; }
 .chip-mint { background: var(--mint); color: var(--mint-deep); border: 1px solid #6ee7b7; }
 .chip-gold { background: var(--gold); color: var(--gold-deep); border: 1px solid #fde68a; }
-
+ 
 /* ── EDITOR ── */
 textarea {
   width: 100%;
@@ -204,7 +447,7 @@ textarea {
   transition: border-color .2s, box-shadow .2s;
 }
 textarea:focus { outline: none; border-color: var(--pink-accent); box-shadow: 0 0 0 3px rgba(236,72,153,0.12); }
-
+ 
 /* ── SAMPLE CHIPS ── */
 .samples { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .sample-btn {
@@ -220,7 +463,7 @@ textarea:focus { outline: none; border-color: var(--pink-accent); box-shadow: 0 
   transition: all .15s;
 }
 .sample-btn:hover { border-color: var(--pink-accent); color: var(--pink-accent); background: var(--pink-soft); }
-
+ 
 /* ── BUTTONS ── */
 .btn-row { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
 .btn {
@@ -251,7 +494,7 @@ textarea:focus { outline: none; border-color: var(--pink-accent); box-shadow: 0 
   border-color: transparent;
   color: var(--lilac-deep);
 }
-
+ 
 /* ── METRICS ── */
 .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
 .metric {
@@ -276,7 +519,7 @@ textarea:focus { outline: none; border-color: var(--pink-accent); box-shadow: 0 
 .metric.err .metric-val { color: #ef4444; }
 .metric-lbl { font-size: 11px; color: var(--text-soft); margin-top: 4px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .metric-icon { font-size: 22px; margin-bottom: 4px; }
-
+ 
 /* ── TABLES ── */
 .tbl-wrap { overflow-x: auto; border-radius: 12px; border: 1.5px solid var(--border); }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -286,7 +529,7 @@ td { padding: 9px 16px; border-bottom: 1px solid #fce4ef; vertical-align: middle
 tr:last-child td { border-bottom: none; }
 tr:nth-child(even) td { background: #fff8fb; }
 tr:hover td { background: #fff0f5; }
-
+ 
 /* ── TOKEN BADGES ── */
 .tok { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; font-family: 'DM Mono', monospace; letter-spacing: .03em; }
 .tok-KW   { background: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
@@ -299,7 +542,7 @@ tr:hover td { background: #fff0f5; }
 .tok-ASSIGN { background: #fdf4ff; color: #701a75; border: 1px solid #e879f9; }
 .tok-PUN  { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 .tok-ERR  { background: #fef2f2; color: #b91c1c; border: 1px solid #fca5a5; }
-
+ 
 /* ── ERRORS ── */
 .error-box {
   background: #fef2f2;
@@ -315,7 +558,7 @@ tr:hover td { background: #fff0f5; }
 .error-box.show { display: block; }
 .success-msg { color: var(--mint-deep); font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
 .fail-msg { color: #b91c1c; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-
+ 
 /* ── TREE ── */
 .tree-box {
   background: #fff8fb;
@@ -330,7 +573,7 @@ tr:hover td { background: #fff0f5; }
   overflow-x: auto;
   min-height: 160px;
 }
-
+ 
 /* ── BNF ── */
 .bnf-box {
   background: #fff8fb;
@@ -344,12 +587,12 @@ tr:hover td { background: #fff0f5; }
   white-space: pre;
   overflow-x: auto;
 }
-
+ 
 /* ── LEGEND ── */
 .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
 .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text-mid); font-weight: 600; }
 .legend-dot { width: 16px; height: 16px; border-radius: 4px; }
-
+ 
 /* ── CONWAY WRAP ── */
 .conway-wrap {
   background: #fff8fb;
@@ -358,7 +601,7 @@ tr:hover td { background: #fff0f5; }
   padding: 16px;
   overflow-x: auto;
 }
-
+ 
 /* ── AST WRAP ── */
 .ast-wrap {
   overflow-x: auto;
@@ -367,7 +610,7 @@ tr:hover td { background: #fff0f5; }
   border-radius: 12px;
   padding: 12px;
 }
-
+ 
 /* ── AFD WRAP ── */
 .afd-wrap {
   background: #fff8fb;
@@ -377,7 +620,7 @@ tr:hover td { background: #fff0f5; }
   overflow-x: auto;
   margin-top: 16px;
 }
-
+ 
 /* ── GRID 2-COL ── */
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 768px) {
@@ -386,7 +629,7 @@ tr:hover td { background: #fff0f5; }
   .header-inner { flex-direction: column; height: auto; padding: 12px 0; }
   .nav { flex-wrap: wrap; justify-content: center; }
 }
-
+ 
 /* ── DISCRIMINADORA TABLE ── */
 .disc-table { font-size: 12px; }
 .disc-table td, .disc-table th { padding: 7px 12px; }
@@ -402,7 +645,7 @@ tr:hover td { background: #fff0f5; }
   background: var(--pink-soft);
 }
 .state-error { border-color: #ef4444; background: #fef2f2; color: #b91c1c; }
-
+ 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--rose-50); }
@@ -411,7 +654,48 @@ tr:hover td { background: #fff0f5; }
 </style>
 </head>
 <body>
-
+ 
+<!-- ════════════════════════════════════════════════════════════════ LOGIN SCREEN ════════════════════════════════════════════════════════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-container">
+    <div class="login-header">
+      <div class="login-logo">🔐</div>
+      <h1 class="login-title">Flor Compiler</h1>
+      <p class="login-subtitle">Sistema de Análisis Sintáctico</p>
+    </div>
+    
+    <div class="login-body">
+      <div class="login-university">
+        <h2 class="login-university-name">Universidad Mariano Gálvez</h2>
+        <p class="login-university-detail">Facultad de Ingeniería en Sistemas</p>
+      </div>
+      
+      <div class="login-error" id="loginError"></div>
+      
+      <form onsubmit="handleLogin(event)">
+        <div class="login-form-group">
+          <label class="login-label">Usuario</label>
+          <input type="text" class="login-input" id="loginUser" placeholder="Ingresa tu usuario" autocomplete="off" required>
+        </div>
+        
+        <div class="login-form-group">
+          <label class="login-label">Contraseña</label>
+          <input type="password" class="login-input" id="loginPass" placeholder="Ingresa tu contraseña" autocomplete="off" required>
+        </div>
+        
+        <button type="submit" class="login-btn">🚀 Ingresar</button>
+      </form>
+    </div>
+    
+    <div class="login-footer">
+      <p>Trabajo presentado a <span class="login-footer-strong">Ingeniero Héctor Macz</span></p>
+      <p style="margin-top: 8px; opacity: 0.8;">© 2025 Flor Compiler — All Rights Reserved</p>
+    </div>
+  </div>
+</div>
+ 
+<!-- ════════════════════════════════════════════════════════════════ MAIN APP ════════════════════════════════════════════════════════════════ -->
+ 
 <!-- HEADER -->
 <div class="header">
   <div class="header-inner">
@@ -431,9 +715,9 @@ tr:hover td { background: #fff0f5; }
     </div>
   </div>
 </div>
-
+ 
 <div class="app">
-
+ 
 <!-- ═══ TAB LÉXICO ═══ -->
 <div id="tab-lexico" class="panel active">
   <div class="hero">
@@ -446,7 +730,7 @@ tr:hover td { background: #fff0f5; }
       <span class="chip chip-gold">Operadores</span>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Código Fuente Flor</div>
     <div class="samples">
@@ -465,7 +749,7 @@ escribir(nombre);</textarea>
       <span id="lex-status"></span>
     </div>
   </div>
-
+ 
   <div class="metrics">
     <div class="metric">
       <div class="metric-icon">🪙</div>
@@ -488,7 +772,7 @@ escribir(nombre);</textarea>
       <div class="metric-lbl">Errores</div>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Tabla de Símbolos / Identificadores</div>
     <div class="tbl-wrap">
@@ -498,7 +782,7 @@ escribir(nombre);</textarea>
       </table>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Listado Completo de Tokens Generados</div>
     <div class="tbl-wrap">
@@ -509,7 +793,7 @@ escribir(nombre);</textarea>
     </div>
     <div class="error-box" id="errBox"></div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Patrones de Expresiones Regulares por Categoría</div>
     <div class="tbl-wrap">
@@ -533,7 +817,7 @@ escribir(nombre);</textarea>
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══ TAB AUTÓMATA AFD ═══ -->
 <div id="tab-automata" class="panel">
   <div class="hero">
@@ -546,7 +830,7 @@ escribir(nombre);</textarea>
       <span class="chip chip-gold">Error</span>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">AFD — Identificadores y Palabras Reservadas</div>
     <div class="afd-wrap">
@@ -587,14 +871,14 @@ escribir(nombre);</textarea>
         <text x="260" y="48" text-anchor="middle" fill="#be185d" font-size="10">[a-zA-Z0-9_]</text>
         <!-- q1→q2 (si es kw) -->
         <line x1="288" y1="100" x2="409" y2="100" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arr)"/>
-        <text x="348" y="90" text-anchor="middle" fill="#9d174d" font-size="10">∈ KEYWORDS</text>
+        <text x="348" y="90" text-anchor="middle" fill="#9d174d" font-size="10">∈ Palabras Reservadas</text>
         <!-- q0→qE invalid -->
         <path d="M95 126 Q357 180 591 126" fill="none" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arr2)"/>
         <text x="350" y="175" text-anchor="middle" fill="#b91c1c" font-size="10">símbolo inválido</text>
       </svg>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">AFD — Números (Enteros y Decimales)</div>
     <div class="afd-wrap">
@@ -642,7 +926,7 @@ escribir(nombre);</textarea>
       </svg>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">AFD — Cadenas de Texto</div>
     <div class="afd-wrap">
@@ -677,7 +961,7 @@ escribir(nombre);</textarea>
       </svg>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Tabla de Transiciones — Máquina Discriminadora</div>
     <div class="tbl-wrap">
@@ -725,7 +1009,7 @@ escribir(nombre);</textarea>
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══ TAB SINTÁCTICO ═══ -->
 <div id="tab-sintactico" class="panel">
   <div class="hero">
@@ -737,7 +1021,7 @@ escribir(nombre);</textarea>
       <span class="chip chip-lilac">Árbol Sintáctico</span>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Árbol Sintáctico — Vista Texto</div>
     <div class="btn-row">
@@ -747,7 +1031,20 @@ escribir(nombre);</textarea>
     <div class="tree-box" id="treeBox">El árbol sintáctico aparecerá aquí después de hacer clic en "Generar"...</div>
     <div class="error-box" id="synErrBox"></div>
   </div>
-
+ 
+  <div class="card">
+    <div class="section-label">Árbol Sintáctico — Vista Visual Interactiva</div>
+    <div style="display:flex;gap:12px;margin-bottom:12px;">
+      <button class="btn primary" style="flex:0" onclick="treeOffsetX=0;treeOffsetY=0;lastParsedTree&&(()=>{const visualSvg=`<svg id='treeVisualSvg' viewBox='0 0 1200 700' xmlns='http://www.w3.org/2000/svg' style='width:100%;height:600px;border:1px solid #f5c6d8;border-radius:12px;background:linear-gradient(135deg,#fff0f5,#fce7f3);cursor:grab;'>${renderTreeVisual(lastParsedTree,600,40,150,90)}</svg>`;document.getElementById('treeVisual').innerHTML=visualSvg;initTreeDragHandlers();})()">🔄 Resetear Posición</button>
+      <p style="flex:1;margin:0;padding:8px;font-size:12px;color:#9d6b81;line-height:1.5;"><strong>✋ Haz clic y arrastra</strong> cualquier nodo para mover todo el árbol. Los nodos están bien separados para evitar confusiones. Usa el botón para volver a la posición original.</p>
+    </div>
+    <div style="background:#fff;border:1px solid #f5c6d8;border-radius:12px;padding:16px;overflow:auto;height:600px;">
+      <div id="treeVisual" style="min-height:400px;display:flex;align-items:center;justify-content:center;color:#999;font-style:italic;">
+        Genera el árbol para ver la visualización...
+      </div>
+    </div>
+  </div>
+ 
   <div class="card">
     <div class="section-label">Tabla de Análisis LL(1) — Fragmento</div>
     <div class="tbl-wrap">
@@ -765,27 +1062,28 @@ escribir(nombre);</textarea>
       </table>
     </div>
   </div>
-
+ 
   <div class="card">
-    <div class="section-label">Conjuntos FIRST y FOLLOW</div>
+    <div class="section-label">PRIMEROS (First) y SIGUIENTES (Follow)</div>
+    <p style="font-size:13px;color:#6b3a52;margin-bottom:16px;">Los conjuntos <strong>PRIMEROS</strong> indican con qué símbolos puede comenzar una regla gramatical. Los <strong>SIGUIENTES</strong> muestran qué símbolos pueden venir después.</p>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>No Terminal</th><th>FIRST ( α )</th><th>FOLLOW ( A )</th></tr></thead>
+        <thead><tr><th>No Terminal</th><th>PRIMEROS ( α )</th><th>SIGUIENTES ( A )</th></tr></thead>
         <tbody>
-          <tr><td><strong>programa</strong></td><td>var, si, mientras, escribir, leer, ID, EOF</td><td>EOF</td></tr>
-          <tr><td><strong>sentencia</strong></td><td>var, si, mientras, escribir, leer, ID</td><td>}, EOF</td></tr>
-          <tr><td><strong>declaracion</strong></td><td>var</td><td>var, si, mientras, escribir, leer, ID, }</td></tr>
-          <tr><td><strong>asignacion</strong></td><td>ID</td><td>var, si, mientras, escribir, leer, ID, }</td></tr>
-          <tr><td><strong>si_stmt</strong></td><td>si</td><td>var, si, mientras, escribir, leer, ID, }, EOF</td></tr>
-          <tr><td><strong>mientras_stmt</strong></td><td>mientras</td><td>var, si, mientras, escribir, leer, ID, }, EOF</td></tr>
-          <tr><td><strong>expresion</strong></td><td>ENTERO, DECIMAL, CADENA, BOOL, ID, (</td><td>; ) , == != &lt; &gt; &lt;= &gt;=</td></tr>
-          <tr><td><strong>termino</strong></td><td>ENTERO, DECIMAL, CADENA, BOOL, ID, (</td><td>+ - ; ) , op_rel</td></tr>
-          <tr><td><strong>factor</strong></td><td>ENTERO, DECIMAL, CADENA, BOOL, ID, (</td><td>* / % + - ; ) op_rel</td></tr>
+          <tr><td><strong>programa</strong></td><td>{ var, si, mientras, escribir, leer, ID }</td><td>{ EOF }</td></tr>
+          <tr><td><strong>sentencia</strong></td><td>{ var, si, mientras, escribir, leer, ID }</td><td>{ }, EOF }</td></tr>
+          <tr><td><strong>declaracion</strong></td><td>{ var }</td><td>{ var, si, mientras, escribir, leer, ID, } }</td></tr>
+          <tr><td><strong>asignacion</strong></td><td>{ ID }</td><td>{ var, si, mientras, escribir, leer, ID, } }</td></tr>
+          <tr><td><strong>si_stmt</strong></td><td>{ si }</td><td>{ var, si, mientras, escribir, leer, ID, }, EOF }</td></tr>
+          <tr><td><strong>mientras_stmt</strong></td><td>{ mientras }</td><td>{ var, si, mientras, escribir, leer, ID, }, EOF }</td></tr>
+          <tr><td><strong>expresion</strong></td><td>{ ENTERO, DECIMAL, CADENA, BOOL, ID, ( }</td><td>{ ;, ), comma, ==, !=, <, >, <=, >= }</td></tr>
+          <tr><td><strong>termino</strong></td><td>{ ENTERO, DECIMAL, CADENA, BOOL, ID, ( }</td><td>{ +, -, ;, ), comma, operadores_relacionales }</td></tr>
+          <tr><td><strong>factor</strong></td><td>{ ENTERO, DECIMAL, CADENA, BOOL, ID, ( }</td><td>{ *, /, %, +, -, ;, ), operadores_relacionales }</td></tr>
         </tbody>
       </table>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Control de Errores Sintácticos</div>
     <div class="tbl-wrap">
@@ -801,7 +1099,7 @@ escribir(nombre);</textarea>
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══ TAB AST ═══ -->
 <div id="tab-ast" class="panel">
   <div class="hero">
@@ -822,18 +1120,18 @@ escribir(nombre);</textarea>
             <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="rgba(244,63,122,0.15)"/>
           </filter>
         </defs>
-
+ 
         <!-- ROOT -->
         <rect x="400" y="10" width="140" height="36" rx="10" fill="#fce7f3" stroke="#f43f7a" stroke-width="1.5" filter="url(#shadow)"/>
         <text x="470" y="28" text-anchor="middle" dominant-baseline="central" font-weight="800" fill="#be185d" font-size="13">programa</text>
-
+ 
         <!-- lines to L1 -->
         <line x1="445" y1="46" x2="90" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
         <line x1="458" y1="46" x2="252" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
         <line x1="475" y1="46" x2="444" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
         <line x1="500" y1="46" x2="682" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
         <line x1="525" y1="46" x2="882" y2="94" stroke="#f9a8d4" stroke-width="0.9"/>
-
+ 
         <!-- L1 nodes -->
         <rect x="28" y="94" width="122" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="89" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">declaracion</text>
@@ -845,7 +1143,7 @@ escribir(nombre);</textarea>
         <text x="680" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">si_stmt</text>
         <rect x="838" y="94" width="100" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="888" y="109" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">mientras</text>
-
+ 
         <!-- var x -->
         <line x1="70" y1="124" x2="40" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
         <line x1="89" y1="124" x2="89" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
@@ -859,7 +1157,7 @@ escribir(nombre);</textarea>
         <line x1="139" y1="186" x2="139" y2="206" stroke="#059669" stroke-width="0.7"/>
         <rect x="112" y="206" width="54" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="139" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">10</text>
-
+ 
         <!-- var y -->
         <line x1="230" y1="124" x2="204" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
         <line x1="249" y1="124" x2="249" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
@@ -873,7 +1171,7 @@ escribir(nombre);</textarea>
         <line x1="301" y1="186" x2="301" y2="206" stroke="#059669" stroke-width="0.7"/>
         <rect x="274" y="206" width="54" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="301" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">3.14</text>
-
+ 
         <!-- var nombre -->
         <line x1="418" y1="124" x2="392" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
         <line x1="439" y1="124" x2="439" y2="162" stroke="#93c5fd" stroke-width="0.7"/>
@@ -887,12 +1185,12 @@ escribir(nombre);</textarea>
         <line x1="493" y1="186" x2="493" y2="206" stroke="#059669" stroke-width="0.7"/>
         <rect x="455" y="206" width="78" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="494" y="217" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">"Flor"</text>
-
+ 
         <!-- si_stmt branches -->
         <line x1="655" y1="124" x2="612" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
         <line x1="680" y1="124" x2="712" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
         <line x1="705" y1="124" x2="804" y2="272" stroke="#93c5fd" stroke-width="0.7"/>
-
+ 
         <!-- condicion x>5 -->
         <rect x="564" y="272" width="96" height="30" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="612" y="287" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#065f46" font-size="12">condición</text>
@@ -906,7 +1204,7 @@ escribir(nombre);</textarea>
         <text x="612" y="349" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">&gt;</text>
         <rect x="630" y="338" width="28" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="644" y="349" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">5</text>
-
+ 
         <!-- cuerpo_si -->
         <rect x="670" y="272" width="84" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="712" y="287" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">cuerpo_si</text>
@@ -931,7 +1229,7 @@ escribir(nombre);</textarea>
         <text x="749" y="439" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
         <rect x="774" y="428" width="30" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="789" y="439" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">1</text>
-
+ 
         <!-- cuerpo_sino -->
         <rect x="772" y="272" width="84" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="814" y="287" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">cuerpo_sino</text>
@@ -941,11 +1239,11 @@ escribir(nombre);</textarea>
         <line x1="814" y1="364" x2="814" y2="386" stroke="#93c5fd" stroke-width="0.7"/>
         <rect x="772" y="386" width="82" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="813" y="397" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">"menor"</text>
-
+ 
         <!-- MIENTRAS -->
         <line x1="870" y1="124" x2="852" y2="582" stroke="#93c5fd" stroke-width="0.7"/>
         <line x1="900" y1="124" x2="922" y2="582" stroke="#93c5fd" stroke-width="0.7"/>
-
+ 
         <rect x="802" y="582" width="96" height="30" rx="8" fill="#d1fae5" stroke="#059669" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="850" y="597" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#065f46" font-size="12">condición</text>
         <text x="850" y="618" text-anchor="middle" fill="#6b7280" font-size="11">x &lt; 20</text>
@@ -958,7 +1256,7 @@ escribir(nombre);</textarea>
         <text x="850" y="655" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">&lt;</text>
         <rect x="868" y="644" width="30" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="883" y="655" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">20</text>
-
+ 
         <rect x="900" y="582" width="84" height="30" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="1.2" filter="url(#shadow)"/>
         <text x="942" y="597" text-anchor="middle" dominant-baseline="central" font-weight="700" fill="#1e40af" font-size="12">cuerpo</text>
         <line x1="942" y1="612" x2="942" y2="644" stroke="#93c5fd" stroke-width="0.7"/>
@@ -976,7 +1274,7 @@ escribir(nombre);</textarea>
         <text x="933" y="747" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">ID: x</text>
         <rect x="958" y="736" width="28" height="22" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="0.9"/>
         <text x="972" y="747" text-anchor="middle" dominant-baseline="central" fill="#92400e" font-size="11">2</text>
-
+ 
         <!-- source code box -->
         <rect x="20" y="690" width="550" height="108" rx="10" fill="#fff0f5" stroke="#f9a8d4" stroke-width="1.5"/>
         <text x="36" y="710" fill="#be185d" font-size="10.5" font-weight="800">📝 Código fuente analizado:</text>
@@ -988,57 +1286,57 @@ escribir(nombre);</textarea>
     </div>
   </div>
 </div>
-
+ 
 <!-- ═══ TAB TEORÍA BNF ═══ -->
 <div id="tab-teoria" class="panel">
   <div class="hero">
     <h1>📐 Gramática BNF y Diagrama de Conway</h1>
     <p>La gramática formal en notación BNF (Backus-Naur Form) y los diagramas de Conway (railroad diagrams) que representan visualmente las reglas de producción de Flor.</p>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Gramática BNF Completa — Flor</div>
     <div class="bnf-box">&lt;programa&gt;      ::= { &lt;sentencia&gt; } EOF
-
+ 
 &lt;sentencia&gt;     ::= &lt;declaracion&gt;
                   | &lt;asignacion&gt;
                   | &lt;si&gt;
                   | &lt;mientras&gt;
                   | &lt;escribir&gt;
                   | &lt;leer&gt;
-
+ 
 &lt;declaracion&gt;   ::= 'var' &lt;ID&gt; '=' &lt;expresion&gt; ';'
-
+ 
 &lt;asignacion&gt;    ::= &lt;ID&gt; '=' &lt;expresion&gt; ';'
-
+ 
 &lt;si&gt;            ::= 'si' '(' &lt;condicion&gt; ')' '{' { &lt;sentencia&gt; } '}'
                     [ 'sino' '{' { &lt;sentencia&gt; } '}' ]
-
+ 
 &lt;mientras&gt;      ::= 'mientras' '(' &lt;condicion&gt; ')' '{' { &lt;sentencia&gt; } '}'
-
+ 
 &lt;escribir&gt;      ::= 'escribir' '(' &lt;expresion&gt; ')' ';'
-
+ 
 &lt;leer&gt;          ::= 'leer' '(' &lt;ID&gt; ')' ';'
-
+ 
 &lt;expresion&gt;     ::= &lt;termino&gt; { ('+' | '-') &lt;termino&gt; }
-
+ 
 &lt;termino&gt;       ::= &lt;factor&gt; { ('*' | '/' | '%') &lt;factor&gt; }
-
+ 
 &lt;factor&gt;        ::= ENTERO
                   | DECIMAL
                   | CADENA
                   | BOOLEANO
                   | ID
                   | '(' &lt;expresion&gt; ')'
-
+ 
 &lt;condicion&gt;     ::= &lt;expresion&gt; OP_REL &lt;expresion&gt;
                   | &lt;expresion&gt; OP_LOG &lt;expresion&gt;
                   | '!' &lt;condicion&gt;
-
+ 
 OP_REL          ::= '==' | '!=' | '&lt;' | '&gt;' | '&lt;=' | '&gt;='
 OP_LOG          ::= '&amp;&amp;' | '||'</div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Diagrama de Conway (Railroad Diagrams)</div>
     <div class="conway-wrap">
@@ -1062,7 +1360,7 @@ OP_LOG          ::= '&amp;&amp;' | '||'</div>
         <text x="265" y="38" text-anchor="middle" dominant-baseline="central" fill="#475569">;</text>
         <line x1="276" y1="38" x2="302" y2="38" stroke="#f9a8d4" stroke-width="1.5"/>
         <polygon points="298,34 306,38 298,42" fill="#f43f7a"/>
-
+ 
         <!-- si_stmt -->
         <text x="8" y="78" fill="#9d6b81" font-size="10" font-weight="800">si_stmt</text>
         <line x1="8" y1="90" x2="30" y2="90" stroke="#f9a8d4" stroke-width="1.5"/>
@@ -1092,7 +1390,7 @@ OP_LOG          ::= '&amp;&amp;' | '||'</div>
         <text x="417" y="129" text-anchor="middle" dominant-baseline="central" fill="#92400e">sino { s* }</text>
         <path d="M349,90 Q359,90 359,74 L359,60 Q359,50 369,50 L468,50 Q478,50 478,60 L478,74 Q478,84 488,86 L494,86" fill="none" stroke="#f9a8d4" stroke-width="1.5"/>
         <polygon points="490,82 498,86 490,90" fill="#f43f7a"/>
-
+ 
         <!-- expresion -->
         <text x="8" y="168" fill="#9d6b81" font-size="10" font-weight="800">expresion</text>
         <line x1="8" y1="180" x2="30" y2="180" stroke="#f9a8d4" stroke-width="1.5"/>
@@ -1106,7 +1404,7 @@ OP_LOG          ::= '&amp;&amp;' | '||'</div>
         <text x="203" y="180" text-anchor="middle" dominant-baseline="central" fill="#5b21b6">termino</text>
         <line x1="228" y1="180" x2="244" y2="180" stroke="#f9a8d4" stroke-width="1.5"/>
         <polygon points="240,176 248,180 240,184" fill="#f43f7a"/>
-
+ 
         <!-- mientras -->
         <text x="8" y="228" fill="#9d6b81" font-size="10" font-weight="800">mientras_stmt</text>
         <line x1="8" y1="240" x2="30" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
@@ -1131,7 +1429,7 @@ OP_LOG          ::= '&amp;&amp;' | '||'</div>
         <text x="277" y="240" text-anchor="middle" dominant-baseline="central" fill="#475569">}</text>
         <line x1="286" y1="240" x2="304" y2="240" stroke="#f9a8d4" stroke-width="1.5"/>
         <polygon points="300,236 308,240 300,244" fill="#f43f7a"/>
-
+ 
         <!-- leyenda -->
         <rect x="580" y="16" width="304" height="156" rx="10" fill="rgba(255,240,245,0.9)" stroke="#f9a8d4" stroke-width="1.5"/>
         <text x="598" y="36" fill="#be185d" font-size="10.5" font-weight="800">LEYENDA — NOTACIÓN RAILROAD</text>
@@ -1151,7 +1449,7 @@ OP_LOG          ::= '&amp;&amp;' | '||'</div>
       </svg>
     </div>
   </div>
-
+ 
   <div class="card">
     <div class="section-label">Análisis Sintáctico Completo LL(1) — Bloque de Código Ejemplo</div>
     <div class="tbl-wrap">
@@ -1175,12 +1473,12 @@ OP_LOG          ::= '&amp;&amp;' | '||'</div>
     </div>
   </div>
 </div>
-
+ 
 </div><!-- end .app -->
-
+ 
 <script>
 const KEYWORDS = new Set(['si','sino','mientras','var','fin','leer','escribir','retorna','verdadero','falso']);
-
+ 
 const samples = [
 `var x = 10;
 var y = 3.14;
@@ -1207,20 +1505,20 @@ var x = 10;
 x = x @ 2;
 escribir(x`
 ];
-
+ 
 function loadSample(i) { document.getElementById('srcCode').value = samples[i]; }
-
+ 
 function showTab(name, el) {
   document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('tab-' + name).classList.add('active');
 }
-
+ 
 const tokRegex = {KW:'PALABRA_RESERVADA',ID:'IDENTIFICADOR',INT:'ENTERO',DEC:'DECIMAL',STR:'CADENA',BOOL:'BOOLEANO',OP:'OP_REL/ARITMÉTICO',ASSIGN:'OP_ASIGNACIÓN',PUN:'PUNTUACIÓN',ERR:'ERROR LÉXICO'};
 const tokRegexPat = {KW:'si|sino|mientras|var|...',ID:'[a-zA-Z_][a-zA-Z0-9_]*',INT:'[0-9]+',DEC:'[0-9]+\\.[0-9]+',STR:'"[^"]*"',BOOL:'verdadero|falso',OP:'[+\\-*/%]|==|!=|<=|>=|<|>',ASSIGN:'=(?!=)',PUN:'[;,(){}]',ERR:'—'};
 const cssClass = {KW:'tok-KW',ID:'tok-ID',INT:'tok-INT',DEC:'tok-DEC',STR:'tok-STR',BOOL:'tok-BOOL',OP:'tok-OP',ASSIGN:'tok-ASSIGN',PUN:'tok-PUN',ERR:'tok-ERR'};
-
+ 
 function tokenize(src) {
   const tokens=[], errors=[];
   let i=0, line=1;
@@ -1264,7 +1562,62 @@ function tokenize(src) {
   }
   return {tokens,errors};
 }
-
+ 
+/* ═══════════════════════════════════════════════════════════════════ LOGIN AUTH ═══════════════════════════════════════════════════════════════════ */
+const CREDENTIALS = {
+  usuario: 'admin',
+  contraseña: '123456mariano'
+};
+ 
+function handleLogin(e) {
+  e.preventDefault();
+  
+  const usuario = document.getElementById('loginUser').value;
+  const contraseña = document.getElementById('loginPass').value;
+  const errorDiv = document.getElementById('loginError');
+  
+  // Validar credenciales
+  if (usuario === CREDENTIALS.usuario && contraseña === CREDENTIALS.contraseña) {
+    // Login exitoso
+    sessionStorage.setItem('florCompilerAuth', 'true');
+    document.getElementById('loginScreen').classList.add('hidden');
+    setTimeout(() => {
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPass').value = '';
+    }, 300);
+  } else {
+    // Error de login
+    errorDiv.textContent = '❌ Usuario o contraseña incorrectos. Intenta de nuevo.';
+    errorDiv.classList.add('show');
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginPass').focus();
+    setTimeout(() => {
+      errorDiv.classList.remove('show');
+    }, 4000);
+  }
+}
+ 
+// Verificar si ya está autenticado al cargar
+window.addEventListener('load', () => {
+  if (sessionStorage.getItem('florCompilerAuth') === 'true') {
+    document.getElementById('loginScreen').classList.add('hidden');
+  }
+});
+ 
+// Permitir Enter en los inputs
+document.addEventListener('DOMContentLoaded', () => {
+  const loginUser = document.getElementById('loginUser');
+  const loginPass = document.getElementById('loginPass');
+  
+  if (loginPass) {
+    loginPass.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        handleLogin(e);
+      }
+    });
+  }
+});
+ 
 function runLexer(){
   const src=document.getElementById('srcCode').value;
   const {tokens,errors}=tokenize(src);
@@ -1274,15 +1627,15 @@ function runLexer(){
   document.getElementById('m-lines').textContent=lines;
   document.getElementById('m-ids').textContent=ids.length;
   document.getElementById('m-errs').textContent=errors.length;
-
+ 
   // count uses
   const useCnt={};
   tokens.forEach(t=>{if(t.type==='ID')useCnt[t.lex]=(useCnt[t.lex]||0)+1;});
-
+ 
   document.getElementById('tokBody').innerHTML=tokens.map((t,i)=>
     `<tr><td style="color:#9d6b81;font-family:'DM Mono',monospace">${i+1}</td><td><code style="background:#fff0f5;padding:2px 8px;border-radius:5px;color:#be185d">${esc(t.lex)}</code></td><td><span class="tok ${cssClass[t.type]||'tok-PUN'}">${tokRegex[t.type]||t.type}</span></td><td style="font-family:'DM Mono',monospace;font-size:11px;color:#9d6b81">${tokRegexPat[t.type]||'—'}</td><td style="color:#6b7280">${t.line}</td></tr>`
   ).join('');
-
+ 
   const symMap={};
   for(let j=0;j<tokens.length;j++){
     if(tokens[j].type==='KW'&&tokens[j].lex==='var'&&tokens[j+1]?.type==='ID'){
@@ -1305,7 +1658,7 @@ function runLexer(){
     :entries.map(([name,{typ,val,ln}])=>
       `<tr><td><code style="background:#fff0f5;padding:2px 8px;border-radius:5px;color:#be185d;font-family:'DM Mono',monospace">${name}</code></td><td><span class="chip chip-${typ==='entero'?'gold':typ==='decimal'?'gold':typ==='cadena'?'lilac':typ==='booleano'?'mint':'rose'}">${typ}</span></td><td><code style="font-family:'DM Mono',monospace">${esc(val)}</code></td><td>${ln}</td><td>${useCnt[name]||1}</td></tr>`
     ).join('');
-
+ 
   const errBox=document.getElementById('errBox');
   if(errors.length>0){
     errBox.className='error-box show';
@@ -1316,7 +1669,7 @@ function runLexer(){
     document.getElementById('lex-status').innerHTML=`<span class="success-msg">✓ ${tokens.length} tokens generados</span>`;
   }
 }
-
+ 
 /* ── PARSER ── */
 let pos=0,toks=[];
 function cur(){return toks[pos]||{type:'EOF',lex:'EOF',line:-1};}
@@ -1363,7 +1716,105 @@ function parseFactor(){
   if(t.lex==='('){eat(null,'(');const e=parseExpr();eat(null,')');return{type:'grupo',expr:e};}
   throw new Error(`Factor inesperado '${t.lex}' en línea ${t.line}`);
 }
-
+ 
+// Guardar último árbol para visualización
+let lastParsedTree=null;
+let treeOffsetX=0,treeOffsetY=0;
+let draggedNode=null,dragStartX=0,dragStartY=0;
+ 
+function renderTreeVisual(node,x=450,y=40,distX=150,vertGap=90,depth=0){
+  if(!node)return'';
+  
+  // Aplicar offset global
+  x+=treeOffsetX;
+  y+=treeOffsetY;
+  
+  const nW=85,nH=42;
+  const nodeId=`node-${Math.random().toString(36).substr(2,9)}`;
+  let svg=`<g id="${nodeId}" class="tree-node-group" data-draggable="true">`;
+  svg+=`<defs><linearGradient id="grad${depth}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" style="stop-color:#f43f7a;stop-opacity:1" /><stop offset="100%" style="stop-color:#e11d62;stop-opacity:1" /></linearGradient></defs>`;
+  svg+=`<rect x="${x-nW/2}" y="${y-nH/2}" width="${nW}" height="${nH}" rx="6" fill="url(#grad${depth})" stroke="white" stroke-width="2.5" class="tree-node" data-node-id="${nodeId}" style="cursor:grab;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));"/><text x="${x}" y="${y+4}" text-anchor="middle" font-family="'DM Mono'" font-size="10" fill="white" font-weight="bold" pointer-events="none">${getNodeLabel(node)}</text></g>`;
+  
+  let children=[],idx=0;
+  if(node.children)children=node.children;
+  else{
+    if(node.cond)children.push(node.cond);
+    if(node.expr)children.push(node.expr);
+    if(node.left)children.push(node.left);
+    if(node.right)children.push(node.right);
+    if(node.body)children.push(...node.body);
+  }
+  
+  if(children.length>0){
+    const totalWidth=children.length*distX;
+    let startX=x-(totalWidth/2)+distX/2;
+    children.forEach((c,i)=>{
+      let cX=startX+(i*distX);
+      const nextY=y+vertGap;
+      svg+=`<line x1="${x}" y1="${y+nH/2}" x2="${cX}" y2="${nextY-nH/2}" stroke="#f43f7a" stroke-width="2" opacity="0.8" class="tree-line" pointer-events="none" stroke-linecap="round"/><circle cx="${x}" cy="${y+nH/2}" r="1.5" fill="#f43f7a" opacity="0.6"/>`;
+      svg+=renderTreeVisual(c,cX,nextY,distX*0.85,vertGap,depth+1);
+    });
+  }
+  return svg;
+}
+ 
+function getNodeLabel(node){
+  if(node.type==='programa')return'PROG';
+  if(node.type==='declaracion')return`VAR`;
+  if(node.type==='asignacion')return`ASIG`;
+  if(node.type==='si')return'SI';
+  if(node.type==='mientras')return'WHILE';
+  if(node.type==='escribir')return'PRINT';
+  if(node.type==='leer')return'READ';
+  if(node.type==='condicion')return node.op||'?';
+  if(node.type==='expr'||node.type==='term')return node.op||'expr';
+  if(node.type==='factor')return(node.val+'').substring(0,7);
+  if(node.type==='grupo')return'( )';
+  return'?';
+}
+ 
+function initTreeDragHandlers(){
+  const svg=document.getElementById('treeVisualSvg');
+  if(!svg)return;
+  
+  svg.addEventListener('mousedown',(e)=>{
+    const node=e.target.closest('.tree-node');
+    if(!node)return;
+    
+    draggedNode=node;
+    dragStartX=e.clientX;
+    dragStartY=e.clientY;
+    node.style.cursor='grabbing';
+  });
+  
+  document.addEventListener('mousemove',(e)=>{
+    if(!draggedNode)return;
+    
+    const deltaX=e.clientX-dragStartX;
+    const deltaY=e.clientY-dragStartY;
+    
+    treeOffsetX+=deltaX;
+    treeOffsetY+=deltaY;
+    
+    dragStartX=e.clientX;
+    dragStartY=e.clientY;
+    
+    // Redibujar el árbol con el nuevo offset
+    if(lastParsedTree){
+      const visualSvg=`<svg id="treeVisualSvg" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:600px;border:1px solid #f5c6d8;border-radius:12px;background:linear-gradient(135deg,#fff0f5,#fce7f3);cursor:grab;">${renderTreeVisual(lastParsedTree,600,40,150,90)}</svg>`;
+      document.getElementById('treeVisual').innerHTML=visualSvg;
+      initTreeDragHandlers();
+    }
+  });
+  
+  document.addEventListener('mouseup',()=>{
+    if(draggedNode){
+      draggedNode.style.cursor='grab';
+      draggedNode=null;
+    }
+  });
+}
+ 
 function renderTree(node,prefix,isLast){
   if(!node)return'';
   const C=isLast?'└── ':'├── ',P=isLast?'    ':'│   ';
@@ -1391,7 +1842,7 @@ function renderTree(node,prefix,isLast){
   else{s+=JSON.stringify(node)+'\n';}
   return s;
 }
-
+ 
 function runParser(){
   const src=document.getElementById('srcCode').value;
   const{tokens,errors:lexErrs}=tokenize(src);
@@ -1405,7 +1856,16 @@ function runParser(){
   }
   try{
     const tree=parseProgram(tokens);
+    lastParsedTree=tree;
+    treeOffsetX=0;
+    treeOffsetY=0;
     treeBox.textContent=renderTree(tree,'',true);
+    
+    // Generar árbol visual con mejor espaciamiento
+    const visualSvg=`<svg id="treeVisualSvg" viewBox="0 0 1200 700" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:600px;border:1px solid #f5c6d8;border-radius:12px;background:linear-gradient(135deg,#fff0f5,#fce7f3);cursor:grab;">${renderTreeVisual(tree,600,40,150,90)}</svg>`;
+    document.getElementById('treeVisual').innerHTML=visualSvg;
+    initTreeDragHandlers();
+    
     synErrBox.className='error-box';
     document.getElementById('syn-status').innerHTML=`<span class="success-msg">✓ Árbol generado correctamente</span>`;
   }catch(e){
@@ -1415,7 +1875,7 @@ function runParser(){
     document.getElementById('syn-status').innerHTML=`<span class="fail-msg">✗ Error sintáctico</span>`;
   }
 }
-
+ 
 function clearAll(){
   document.getElementById('srcCode').value='';
   document.getElementById('tokBody').innerHTML='<tr><td colspan="5" style="text-align:center;color:#cca;padding:22px;font-style:italic">Ejecuta el análisis para ver los tokens...</td></tr>';
@@ -1424,10 +1884,10 @@ function clearAll(){
   document.getElementById('errBox').className='error-box';
   document.getElementById('lex-status').innerHTML='';
 }
-
+ 
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
-
+ 
 <div style="margin:40px auto 20px auto;padding:16px;text-align:center;
 font-family:'Nunito',sans-serif;
 color:#6b3a52;
@@ -1437,6 +1897,6 @@ max-width:1200px;">
 Aplicación desarrollada por la estudiante de Ingeniería en Sistemas<br>
 <strong>Irma Yaritza Katiuxca Jagan Xol</strong>
 </div>
-
+ 
 </body>
 </html>
